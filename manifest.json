@@ -1,0 +1,22 @@
+{
+  "background_color": "#FFFFFF",
+  "description": "Pulsar Bluetooth Remote Access",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Pulsar Bluetooth Remote Access",
+  "orientation": "any",
+  "scope": "./",
+  "short_name": "Pulsar-Webapp",
+  "start_url": "index.html",
+  "theme_color": "#E4ECED",
+  "categories": [],
+  "screenshots": [],
+  "icons": [
+    {
+      "src": "./img/pulsaricon-rgb512x512t2.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "shortcuts": []
+}
