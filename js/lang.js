@@ -587,4 +587,12 @@ var lang_array = [
         English: "Setting new Bluetooth device name. Please wait...",
         German: "Neuen Bluetooth-Gerätenamen festlegen. Bitte Warten...",
     },
+    {   //Index 145
+        English: "READ PARAMS",
+        German: "PARAM LESEN",
+    },
+    {   //Index 146
+        English: "WRITE PARAMS",
+        German: "SCHREIBEN SIE PARAM",
+    },        
 ];
