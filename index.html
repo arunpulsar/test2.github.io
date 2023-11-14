@@ -1221,7 +1221,7 @@ async function incomingData(event){
         await inboundChar.writeValue(encoder.encode(commandToSend));
       } 
       catch(error) {
-        log(lang_map[78] + error);//log('Failed: ' + error);
+        log('Failed1: ' + error);//log(lang_map[78] + error);//log('Failed: ' + error);
       }
     }
 
@@ -1256,7 +1256,7 @@ async function incomingData(event){
         button_press = 3;
       }
       catch(error) {
-        log(lang_map[78] + error);//log('Failed: ' + error);
+        log('Failed2: ' + error);//log(lang_map[78] + error);//log('Failed: ' + error);
       }
     }
 
@@ -1295,7 +1295,7 @@ async function sendAT(cmd) {
         await inboundChar.writeValue(encoder.encode(commandToSend));
       } 
       catch(error) {
-        log(lang_map[78] + error);//log('Failed: ' + error);
+        log('Failed3: ' + error);//log(lang_map[78] + error);//log('Failed: ' + error);
       }
     }
 
@@ -3098,7 +3098,7 @@ function myLoadFunction() {
             <p style="font-family:'Segoe UI Normal';  width: 115%; text-align:center; color:#ffffff; font-size:20pt;line-height:40px;">&copy; Pulsar Measurement 2023<br></p>
           </td>
           <td style=" text-align:center;font-size:24px;  background-color:rgb(51, 179, 74);;color:#2e2323;">
-            <p style="font-family:'Segoe UI Normal';  width: 0%; text-align:right; color:#ffffff; font-size:12pt;line-height:40px; font-style: italic;">v3.0.4<br></p>
+            <p style="font-family:'Segoe UI Normal';  width: 0%; text-align:right; color:#ffffff; font-size:12pt;line-height:40px; font-style: italic;">v3.1.0<br></p>
           </td>
         </tr>
       </table>
