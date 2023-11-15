@@ -1221,14 +1221,14 @@ async function incomingData(event){
         await inboundChar.writeValue(encoder.encode(commandToSend));
       } 
       catch(error) {
-        log('Failed1: ' + error);//log(lang_map[78] + error);//log('Failed: ' + error);
+        log(lang_map[78] + error);//log('Failed: ' + error);
       }
     }
 
       async function ble_connect() {
         isIgnore_2=0; isDisconnecting =0;  isTerminated=0;
 
-      //try {
+      try {
         // Define a scan filter and prepare for interaction with Codeless Service
           log('');
           log(lang_map[79]);////log('Requesting Bluetooth Device...');
@@ -1238,10 +1238,10 @@ async function incomingData(event){
           document.getElementById('id_title').innerHTML =deviceName;
           document.getElementById('device_title').innerHTML =device.name;
           document.getElementById('deviceName-box').value = device.name;
-        
+  
         device.addEventListener('gattserverdisconnected', onDisconnected);	
         // Connect to device GATT and perform attribute discovery
-          server = await device.gatt.connect();
+        server = await device.gatt.connect();
         const service = await server.getPrimaryService(CODELESS_SVC_UUID);
         inboundChar = await service.getCharacteristic(INBOUND_CHAR_UUID);
         outboundChar = await service.getCharacteristic(OUTBOUND_CHAR_UUID);
@@ -1252,12 +1252,11 @@ async function incomingData(event){
         login_stage = 1;
         // sendATL('AT+AUTH=123321'); //--> BB: commented
         //sendATL('AT+AUTH=123654'); //--> BB: commented
-        try{
-        sendATL('AT+AUTH=000000'); //--> BB: commented
+        sendATL('AT+PIN=123456');//sendATL('AT+AUTH=000000'); //--> BB: commented
         button_press = 3;
       }
       catch(error) {
-        log('Failed2: ' + error);//log(lang_map[78] + error);//log('Failed: ' + error);
+        log(lang_map[78] + error);//log('Failed: ' + error);
       }
     }
 
@@ -1296,7 +1295,7 @@ async function sendAT(cmd) {
         await inboundChar.writeValue(encoder.encode(commandToSend));
       } 
       catch(error) {
-        log('Failed3: ' + error);//log(lang_map[78] + error);//log('Failed: ' + error);
+        log(lang_map[78] + error);//log('Failed: ' + error);
       }
     }
 
@@ -3099,7 +3098,7 @@ function myLoadFunction() {
             <p style="font-family:'Segoe UI Normal';  width: 115%; text-align:center; color:#ffffff; font-size:20pt;line-height:40px;">&copy; Pulsar Measurement 2023<br></p>
           </td>
           <td style=" text-align:center;font-size:24px;  background-color:rgb(51, 179, 74);;color:#2e2323;">
-            <p style="font-family:'Segoe UI Normal';  width: 0%; text-align:right; color:#ffffff; font-size:12pt;line-height:40px; font-style: italic;">v3.1.4<br></p>
+            <p style="font-family:'Segoe UI Normal';  width: 0%; text-align:right; color:#ffffff; font-size:12pt;line-height:40px; font-style: italic;">v3.0.4<br></p>
           </td>
         </tr>
       </table>
