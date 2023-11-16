@@ -1200,7 +1200,7 @@ async function incomingData(event){
           await sleep(2 * 1000); // needed 
           isIgnore=1;
       }
-      else if(cmd.includes("AT+AUTH="))      
+      else if((cmd.includes("AT+AUTH=")) ||  (cmd.includes("AT+PIN=")))
       {
       }
       else if(cmd === 'AT+PT=0'){
@@ -2200,7 +2200,8 @@ function myLoadFunction() {
 
   function sendLoginCmd() {
     //alert("sendLoginCmd"+'AT+AUTH='+document.getElementById("pswbox").value);
-    sendATL('AT+AUTH='+document.getElementById("pswbox").value);
+    //sendATL('AT+AUTH='+document.getElementById("pswbox").value);
+    sendATL('AT+PIN='+document.getElementById("pswbox").value);
   }
   function closeForm2() {
     document.getElementById('lblpsw').innerHTML ='';
@@ -3099,7 +3100,7 @@ function myLoadFunction() {
             <p style="font-family:'Segoe UI Normal';  width: 115%; text-align:center; color:#ffffff; font-size:20pt;line-height:40px;">&copy; Pulsar Measurement 2023<br></p>
           </td>
           <td style=" text-align:center;font-size:24px;  background-color:rgb(51, 179, 74);;color:#2e2323;">
-            <p style="font-family:'Segoe UI Normal';  width: 0%; text-align:right; color:#ffffff; font-size:12pt;line-height:40px; font-style: italic;">v3.0.4<br></p>
+            <p style="font-family:'Segoe UI Normal';  width: 0%; text-align:right; color:#ffffff; font-size:12pt;line-height:40px; font-style: italic;">v4.0.0<br></p>
           </td>
         </tr>
       </table>
