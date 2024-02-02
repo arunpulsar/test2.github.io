@@ -1929,8 +1929,8 @@ function myLoadFunction() {
     }
 }
 
-// Function to download data to a file
-function download(data, filename, type) {
+// Function to save data to a file
+function saveXML(data, filename, type) {
     var currentDate = `${(new Date().toJSON().slice(0,10))}`;
     var today = new Date();
     var currentHours = ('0'+today.getHours()).substr(-2);     
@@ -1953,6 +1953,33 @@ function download(data, filename, type) {
             window.URL.revokeObjectURL(url);  
         }, 0); 
     }
+}
+
+// Function to open an XML file
+function openXML() {
+
+    // var currentDate = `${(new Date().toJSON().slice(0,10))}`;
+    // var today = new Date();
+    // var currentHours = ('0'+today.getHours()).substr(-2);     
+    // var currentMins = ('0'+today.getMinutes()).substr(-2);     
+    // var currentSecs = ('0'+today.getSeconds()).substr(-2);    
+    // filename = currentDate + '_' + currentHours + '_' + currentMins + '_' + currentSecs;
+    // //filename = `${(new Date().toJSON().slice(0,10))}_${(new Date().getHours().slice(-2))}_${(new Date().getMinutes().slice(-2))}_${(new Date().getSeconds().slice(-2))}`;
+    // var file = new Blob([data], {type: 'text/xml'});
+    // if (window.navigator.msSaveOrOpenBlob) // IE10+
+    //     window.navigator.msSaveOrOpenBlob(file, filename);
+    // else { // Others
+    //     var a = document.createElement("a"),
+    //             url = URL.createObjectURL(file);
+    //     a.href = url;
+    //     a.download = filename;
+    //     document.body.appendChild(a);
+    //     a.click();
+    //     setTimeout(function() {
+    //         document.body.removeChild(a);
+    //         window.URL.revokeObjectURL(url);  
+    //     }, 0); 
+    // }
 }
 
   </script>
@@ -2214,7 +2241,13 @@ function download(data, filename, type) {
     color: red;
     font-style: italic;
     font-weight: normal;
-  }
+
+  .custom-file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+}
 </style>
 
 
@@ -3047,9 +3080,22 @@ function download(data, filename, type) {
               <td><button type="button" id="btnwriteparam" class="button" onclick="button_press = 31; write_param();">WRITE PARAMS</button></td>
             </tr>
             <tr>
-              <td><button type="button" id="btnopenfile" class="button" onclick="button_press = 30; download();">OPEN FILE</button></td>
+
+              
+              <!-- <td><button type="button" id="btnopenfile" class="file" name="attachement" />OPEN FILE</button></td> -->
+              <!-- <td><label for="inputId">OPEN FILE</label><input id="inputId" type="file" style="position: fixed; top: -100em"></td> -->
+              <!-- <td>
+                <label class="custom-file-upload">
+                  <input type="file" />
+                  Custom Upload
+              </label>
+              </td> -->
+              <!-- <td><input type="button" id="my-button" value="Select Files">
+                <input type="file" name="my_file" id="my-file"></td> -->
+                <input id="fileInput" type="file" accept="text/xml" style="display:none;" />
+                <td><input type="button" class="button" value="OPEN FILE" onclick="button_press = 32; document.getElementById('fileInput').click();" /></td>
               <td></td>
-              <td><button type="button" id="btnsavefile" class="button" onclick="button_press = 31; download();">SAVE FILE</button></td>
+              <td><button type="button" id="btnsavefile" class="button" onclick="button_press = 33; saveXML();">SAVE FILE</button></td>
             </tr>            
             <script>
               document.getElementById("btndeviceName").innerHTML = lang_map[10];
