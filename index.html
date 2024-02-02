@@ -1929,6 +1929,32 @@ function myLoadFunction() {
     }
 }
 
+/**
+ * Determine the mobile operating system.
+ * This function returns one of 'iOS', 'Android', 'Windows Phone', or 'unknown'.
+ *
+ * @returns {String}
+ */
+ function getMobileOperatingSystem() {
+    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+    // Windows Phone must come first because its UA also contains "Android"
+    if (/windows phone/i.test(userAgent)) {
+        return "Windows Phone";
+    }
+
+    if (/android/i.test(userAgent)) {
+        return "Android";
+    }
+
+    // iOS detection from: http://stackoverflow.com/a/9039885/177710
+    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+        return "iOS";
+    }
+
+    return "unknown";
+}
+
 // Function to save data to a file
 function saveXML(data, filename, type) {
     var currentDate = `${(new Date().toJSON().slice(0,10))}`;
@@ -1942,16 +1968,28 @@ function saveXML(data, filename, type) {
     if (window.navigator.msSaveOrOpenBlob) // IE10+
         window.navigator.msSaveOrOpenBlob(file, filename);
     else { // Others
-        var a = document.createElement("a"),
-                url = URL.createObjectURL(file);
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(function() {
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);  
-        }, 0); 
+        var ISmobileDevice = getMobileOperatingSystem();
+        if(ISmobileDevice == "iOS")
+        {
+          document.getElementById('textbox').addEventListener('input', function() {
+              var link = document.getElementById('downloadlink');
+              link.href = makeTextFile(textbox.value);
+              link.style.display = 'block';
+            }, false);
+        }
+        else
+        {
+          var a = document.createElement("a"),
+                  url = URL.createObjectURL(file);
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(function() {
+              document.body.removeChild(a);
+              window.URL.revokeObjectURL(url);  
+          }, 0); 
+      }
     }
 }
 
