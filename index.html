@@ -1200,7 +1200,7 @@ async function incomingData(event){
           await sleep(2 * 1000); // needed 
           isIgnore=1;
       }
-      else if((cmd.includes("AT+AUTH=")) ||  (cmd.includes("AT+PIN=")))
+      else if(cmd.includes("AT+AUTH="))      
       {
       }
       else if(cmd === 'AT+PT=0'){
@@ -1252,8 +1252,7 @@ async function incomingData(event){
         login_stage = 1;
         // sendATL('AT+AUTH=123321'); //--> BB: commented
         //sendATL('AT+AUTH=123654'); //--> BB: commented
-        //sendATL('AT+AUTH=000000'); //--> BB: commented
-        sendATL('AT+PIN=123456');
+        sendATL('AT+AUTH=000000'); //--> BB: commented
         button_press = 3;
       }
       catch(error) {
@@ -1930,6 +1929,32 @@ function myLoadFunction() {
     }
 }
 
+// Function to download data to a file
+function download(data, filename, type) {
+    var currentDate = `${(new Date().toJSON().slice(0,10))}`;
+    var today = new Date();
+    var currentHours = ('0'+today.getHours()).substr(-2);     
+    var currentMins = ('0'+today.getMinutes()).substr(-2);     
+    var currentSecs = ('0'+today.getSeconds()).substr(-2);    
+    filename = currentDate + '_' + currentHours + '_' + currentMins + '_' + currentSecs;
+    //filename = `${(new Date().toJSON().slice(0,10))}_${(new Date().getHours().slice(-2))}_${(new Date().getMinutes().slice(-2))}_${(new Date().getSeconds().slice(-2))}`;
+    var file = new Blob([data], {type: 'text/xml'});
+    if (window.navigator.msSaveOrOpenBlob) // IE10+
+        window.navigator.msSaveOrOpenBlob(file, filename);
+    else { // Others
+        var a = document.createElement("a"),
+                url = URL.createObjectURL(file);
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function() {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);  
+        }, 0); 
+    }
+}
+
   </script>
   
 
@@ -2200,8 +2225,7 @@ function myLoadFunction() {
 
   function sendLoginCmd() {
     //alert("sendLoginCmd"+'AT+AUTH='+document.getElementById("pswbox").value);
-    //sendATL('AT+AUTH='+document.getElementById("pswbox").value);
-    sendATL('AT+PIN='+document.getElementById("pswbox").value);
+    sendATL('AT+AUTH='+document.getElementById("pswbox").value);
   }
   function closeForm2() {
     document.getElementById('lblpsw').innerHTML ='';
@@ -3022,6 +3046,11 @@ function myLoadFunction() {
               <td></td>
               <td><button type="button" id="btnwriteparam" class="button" onclick="button_press = 31; write_param();">WRITE PARAMS</button></td>
             </tr>
+            <tr>
+              <td><button type="button" id="btnopenfile" class="button" onclick="button_press = 30; download();">OPEN FILE</button></td>
+              <td></td>
+              <td><button type="button" id="btnsavefile" class="button" onclick="button_press = 31; download();">SAVE FILE</button></td>
+            </tr>            
             <script>
               document.getElementById("btndeviceName").innerHTML = lang_map[10];
               document.getElementById("btnpWord").innerHTML = lang_map[10];
@@ -3100,7 +3129,7 @@ function myLoadFunction() {
             <p style="font-family:'Segoe UI Normal';  width: 115%; text-align:center; color:#ffffff; font-size:20pt;line-height:40px;">&copy; Pulsar Measurement 2023<br></p>
           </td>
           <td style=" text-align:center;font-size:24px;  background-color:rgb(51, 179, 74);;color:#2e2323;">
-            <p style="font-family:'Segoe UI Normal';  width: 0%; text-align:right; color:#ffffff; font-size:12pt;line-height:40px; font-style: italic;">v4.0.0<br></p>
+            <p style="font-family:'Segoe UI Normal';  width: 0%; text-align:right; color:#ffffff; font-size:12pt;line-height:40px; font-style: italic;">v2.4.2<br></p>
           </td>
         </tr>
       </table>
