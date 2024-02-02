@@ -1971,9 +1971,14 @@ function saveXML(data, filename, type) {
         var ISmobileDevice = getMobileOperatingSystem();
         if(ISmobileDevice == "iOS")
         {
+          if (file !== null) {
+            window.URL.revokeObjectURL(file);
+          }
+          textFile = window.URL.createObjectURL(data);
+
           document.getElementById('textbox').addEventListener('input', function() {
               var link = document.getElementById('downloadlink');
-              link.href = makeTextFile(textbox.value);
+              link.href = textFile;//makeTextFile(textbox.value);
               link.style.display = 'block';
             }, false);
         }
