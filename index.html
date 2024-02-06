@@ -1940,14 +1940,14 @@ function myLoadFunction() {
 
     // Windows Phone must come first because its UA also contains "Android"
     if (/windows phone/i.test(userAgent)) {
-        return "Windows Phone";
+        return "WindowsPhone";
     }
 
     if (/android/i.test(userAgent)) {
         return "Android";
     }
 
-    // iOS detection from: http://stackoverflow.com/a/9039885/177710
+    // iOS detection
     if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
         return "iOS";
     }
@@ -1998,8 +1998,227 @@ function saveXML(data, filename, type) {
     }
 }
 
+let getXMLFile = function(path, callback){
+            let request = new XMLHttpRequest();
+            request.open("GET", path);
+            request.setRequestHeader("Read_Write", "text/xml");
+            request.onreadystatechange = function(){
+                if(request.readyState === 4 && request.status === 200) {
+                  callback(request.responseXML);
+                }
+                request.send();
+            };
+};
+
+function CreateNewReport() 
+{
+    if (window.File && window.FileReader && window.FileList && window.Blob) 
+    {
+        //debugger;
+        
+        var input = $(document.createElement('input'));
+        input.attr("type", "file");
+        input.attr("accept", ".xml");
+        input.attr("id", "fileName");
+
+        input[0].onchange = function (e) 
+        {
+            //debugger;
+            var file = input[0].files[0];
+            var reader = new FileReader();
+
+            // Closure to capture the file information.
+            reader.onload = (function (theFile) 
+            {
+                return function (e) 
+                {
+                    debugger;
+                    // var sXml = e.target.result;
+                    // var eXml = encodeURIComponent(sXml);
+
+                    // var postData = {
+
+                    //     reportXmlLayout: eXml
+                    // };
+
+                    // OpenNewWindow(postData, "ReportDesign/LoadLayoutFromXML");                  
+                    
+                    var parsed = new DOMParser().parseFromString(this.result, "text/xml");
+                    console.log(parsed);
+                };
+            })(file);
+
+            if (file == null)
+                alert('File not loaded');
+            else
+                // Read in the file as a data URL.
+                reader.readAsText(file);
+        };
+
+        input.trigger('click'); // opening dialog
+        return false;
+    }
+    else 
+    {
+        alert('The File APIs are not fully supported by your browser.');
+    }
+    return true;    
+}
+
+$(function() {
+     $("#fileInput").change(function (){
+
+        //var input = $(this).val();
+        //console.log(input.toString());
+
+        var input = $(document.createElement('input'));
+    input.attr("type", "file");
+    input.attr("id", "fileName");
+
+    input[0].onchange = function (e) {
+
+        debugger;
+        var file = input[0].files[0];
+        var reader = new FileReader();
+
+        // Closure to capture the file information.
+        reader.onload = (function (theFile) {
+            return function (e) {
+
+              var parsed = new DOMParser().parseFromString(this.result, "text/xml");
+              console.log(parsed);
+
+                // debugger;
+                // var sXml = e.target.result;
+                // var eXml = encodeURIComponent(sXml);
+
+                // var postData = {
+
+                //     reportXmlLayout: eXml
+                // };
+                // console.log(postData);
+                // OpenNewWindow(postData, "ReportDesign/LoadLayoutFromXML");                    
+            };
+        })(file);
+
+        if (file == null)
+            alert('File not loaded');
+        else
+            // Read in the file as a data URL.
+            reader.readAsText(file);
+    };
+
+    input.trigger('click'); // opening dialog
+
+    return false;        
+
+        // if (window.XMLHttpRequest)
+        // {// code for IE7+, Firefox, Chrome, Opera, Safari
+        // xmlhttp=new XMLHttpRequest();
+        // }
+        // else
+        // {// code for IE6, IE5
+        // xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        // }
+        // xmlhttp.open("GET",fileName,false);
+        // xmlhttp.send();
+        // xmlDoc=xmlhttp.responseXML; 
+
+        // x=xmlDoc.getElementsByTagName("Parameters");
+        // i=0;
+
+        // function displayCD()
+        // {
+        // username=(x[i].getElementsByTagName("Parameters")[0].childNodes[0].nodeValue);
+        // alert(username);
+        // }
+
+
+
+
+
+
+        //getXMLFile(fileName, function(xml) {
+        //  console.log(xml);
+        //});
+       //submit form or whatever
+     });
+  });
+
+function chooseFile() {
+     $("#fileInput").click();
+     return false;
+}
+
+function ProcessNode(ANode)
+{
+  var FID, Attrs, i, Attr, ChildNodes;
+  
+  // Create a log folder for each node and activate the folder
+  FID = Log.CreateFolder(ANode.nodeName);
+  Log.PushLogFolder(FID);
+
+  // If the node value is not null, output it
+  if( aqObject.GetVarType(ANode.nodeValue) != 1)
+    Log.Message("Value: " + aqConvert.VarToStr(ANode.nodeValue));
+       
+  // Process the node's attributes
+  
+  // Exclude helper nodes from processing
+  if( ANode.nodeName.charAt(0) != "\#")
+  {
+    // Obtain the attribute collection and
+    // output the attributes to the log
+    Attrs = ANode.attributes;
+    for(i = 0; i < Attrs.length; i++)
+    {
+      Attr = Attrs.item(i);
+      Log.Message("Attr " + Attr.nodeName + ": " + Attr.nodeValue);
+    }
+  }
+    
+  // Obtain the collection of child nodes
+  ChildNodes = ANode.childNodes;
+  // Processes each node of the collection
+  for(i = 0; i < ChildNodes.length; i++)
+     ProcessNode(ChildNodes.item(i));
+  
+  // Close the log folder
+  Log.PopLogFolder();
+}
+
 // Function to open an XML file
 function openXML() {
+  var Doc, Node, s;
+  const xmlfile = document.getElementById('fileInput').click();
+  const xmlDocument = new DOMParser().parseFromString(xmlfile, "text/xml");
+  console.log(xmlDocument);
+  /*
+  // Create a COM object
+  // If you have MSXML 4:
+  Doc = Sys.OleObject("Msxml2.DOMDocument.4.0");
+  // If you have MSXML 6:
+  Doc = Sys.OleObject("Msxml2.DOMDocument.6.0");
+  Doc.async = false;
+  Doc.load(xmlfile);
+  Doc.setProperty("ProhibitDTD", false);
+
+  // Report an error, if, for instance, the markup or file structure is invalid
+  if(Doc.parseError.errorCode != 0)
+  {
+    s = "Reason:\t" + Doc.parseError.reason + "\n" +
+        "Line:\t" + aqConvert.VarToStr(Doc.parseError.line) + "\n" +
+        "Pos:\t" + aqConvert.VarToStr(Doc.parseError.linePos) + "\n" +
+        "Source:\t" + Doc.parseError.srcText;
+    // Post an error to the log and exit
+    Log.Error("Cannot parse the document.", s);
+    return;
+  }
+  // Obtain the node
+  Node = Doc.documentElement;
+ 
+  // Process the node
+  ProcessNode(Node);
 
     // var currentDate = `${(new Date().toJSON().slice(0,10))}`;
     // var today = new Date();
@@ -2022,7 +2241,7 @@ function openXML() {
     //         document.body.removeChild(a);
     //         window.URL.revokeObjectURL(url);  
     //     }, 0); 
-    // }
+    // } */
 }
 
   </script>
@@ -3135,8 +3354,10 @@ function openXML() {
               </td> -->
               <!-- <td><input type="button" id="my-button" value="Select Files">
                 <input type="file" name="my_file" id="my-file"></td> -->
-                <input id="fileInput" type="file" accept="text/xml" style="display:none;" />
-                <td><input type="button" class="button" value="OPEN FILE" onclick="button_press = 32; document.getElementById('fileInput').click();" /></td>
+                
+                <!-- <input id="fileInput" type="file" accept="text/xml" style="display:none;" /> -->
+                <!-- <td><input type="button" class="button" value="OPEN FILE" onclick="button_press = 32; openXML();/*document.getElementById('fileInput').click();*/" /></td> -->
+                <td><button type="button" class="button" value="OPEN FILE" onclick="button_press = 32; CreateNewReport();/*chooseFile();*/">OPEN FILE</button></td>
               <td></td>
               <td><button type="button" id="btnsavefile" class="button" onclick="button_press = 33; saveXML();">SAVE FILE</button></td>
             </tr>            
