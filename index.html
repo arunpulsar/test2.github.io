@@ -2015,7 +2015,8 @@ function CreateNewReport()
     if (window.File && window.FileReader && window.FileList && window.Blob) 
     {
         //debugger;
-        
+        var x;    
+        var y;
         var input = $(document.createElement('input'));
         input.attr("type", "file");
         input.attr("accept", ".xml");
@@ -2032,19 +2033,20 @@ function CreateNewReport()
             {
                 return function (e) 
                 {
-                    debugger;
-                    // var sXml = e.target.result;
-                    // var eXml = encodeURIComponent(sXml);
+                    //debugger;
+                  /*  var sXml = e.target.result;
+                    var eXml = encodeURIComponent(sXml);
+                    var postData = {
+                        reportXmlLayout: eXml
+                    };
+                    OpenNewWindow(postData, "ReportDesign/LoadLayoutFromXML");                  
+                    */
+                    var parsed = new DOMParser().parseFromString(e.target.result, "application/xml");
+                    //console.log(parsed);
 
-                    // var postData = {
-
-                    //     reportXmlLayout: eXml
-                    // };
-
-                    // OpenNewWindow(postData, "ReportDesign/LoadLayoutFromXML");                  
-                    
-                    var parsed = new DOMParser().parseFromString(this.result, "text/xml");
-                    console.log(parsed);
+                    y = parsed.getElementsByTagName("Parameters");
+                    x = y[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
+                    alert(x);
                 };
             })(file);
 
