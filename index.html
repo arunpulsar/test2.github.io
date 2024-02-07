@@ -2023,14 +2023,15 @@ function saveXML(data, filename, type) {
     var xmlDoc = parser.parseFromString(xhr.responseText, "application/xml");
     // console.log(xmlDoc);
 
-    var param_title;    
+    var param_title;
+    var param_total;
     var param_section;
     param_title = xmlDoc.getElementsByTagName("Parameters");//.childNodes[0];
     param_section = param_title[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
     alert(param_section);    
 
-    //param_total = param_title[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
-    for(var i = 0; i < param_val[0]; i++)
+    param_total = param_title[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
+    for(var i = 0; i < param_total; i++)
     {
         if(param_num[i] == param_title[i + 1].getElementsByTagName("Parameter")[0].childNodes[0].nodeValue)
         {
@@ -2040,7 +2041,7 @@ function saveXML(data, filename, type) {
         }
         else  // For older versions
         {
-            for(var j = i; j < param_val[0]; j++)
+            for(var j = i; j < param_total; j++)
             {
                 if(param_num[i] == param_title[j + 1].getElementsByTagName("Parameter")[0].childNodes[0].nodeValue)
                 {
