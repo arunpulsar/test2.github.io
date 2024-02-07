@@ -2033,23 +2033,11 @@ function saveXML(data, filename, type) {
     param_total = param_title[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
     for(var i = 0; i < param_total; i++)
     {
-        if(param_num[i] == param_title[i + 1].getElementsByTagName("Parameter")[0].childNodes[0].nodeValue)
+        if(param_num[i] == param_title[i + 1].getElementsByTagName("Parameter")[0].childNodes[0].nodeValue) // Redundant check. But safer.
         {
             param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue = param_val[i];
             param_title[i + 1].getElementsByTagName("Display_value")[0].childNodes[0].nodeValue = param_val[i];
             console.log(param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue + "\n");
-        }
-        else  // For older versions
-        {
-            for(var j = i; j < param_total; j++)
-            {
-                if(param_num[i] == param_title[j + 1].getElementsByTagName("Parameter")[0].childNodes[0].nodeValue)
-                {
-                    param_title[j + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue = param_val[i];
-                    param_title[j + 1].getElementsByTagName("Display_value")[0].childNodes[0].nodeValue = param_val[i];
-                    console.log(param_title[j + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue + "\n");
-                }
-            }
         }
     }
 
@@ -2144,8 +2132,27 @@ function openXML()
                     param_total = param_title[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
                     for(var i = 0; i < param_total; i++)
                     {
-                        param_val[i] = param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
-                        //console.log(i + ". " + param_num[i] + ":" + param_val[i] + "\n");
+                        /*
+                          param_val[i] = param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
+                          //console.log(i + ". " + param_num[i] + ":" + param_val[i] + "\n");
+                        */
+
+                        if(param_num[i] == param_title[i + 1].getElementsByTagName("Parameter")[0].childNodes[0].nodeValue)
+                        {
+                            param_val[i] = param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
+                            //console.log(i + ". " + param_num[i] + ":" + param_val[i] + "\n");
+                        }
+                        else  // For older versions (For missing parameters, skip and find the correct index)
+                        {
+                            for(var j = i; j < param_info.length; j++)
+                            {
+                                if(param_num[j] == param_title[i + 1].getElementsByTagName("Parameter")[0].childNodes[0].nodeValue)
+                                {
+                                    param_val[j] = param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue ;
+                                    //console.log(j + ". " + param_num[j] + ":" + param_val[j] + "\n");
+                                }
+                            }
+                        }                    
                     }
                 };
             })(file);
