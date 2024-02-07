@@ -151,6 +151,7 @@ function sleep(ms) {
     var lang_map = lang_array.map(a => a.English);
     var param_num = param_info.map(a => a.pnum);
     var param_val = param_info.map(a => a.pvalue);
+    const xmlfile = "./xml/default_1.5.5.xml";
 
     // Resetting all the variables
     function reset_params() {
@@ -1971,8 +1972,7 @@ function saveXML(data, filename, type) {
     //filename = `${(new Date().toJSON().slice(0,10))}_${(new Date().getHours().slice(-2))}_${(new Date().getMinutes().slice(-2))}_${(new Date().getSeconds().slice(-2))}`;
 
     var file = new Blob([data], {type: 'application/xml'});
-
-    var xmlfile = "./xml/default_1.5.5.xml";
+/*
     var rawFile = new XMLHttpRequest();
     rawFile.open("GET", xmlfile, false);
     rawFile.onreadystatechange = function () {
@@ -1984,21 +1984,19 @@ function saveXML(data, filename, type) {
       }
     }
     rawFile.send(null);
-
+*/
 /*
     var xmlDoc;
-    var xmlfile = "file:///C:/a_cprog/DO NOT DELETE/test2/xml/default_1.5.5.xml";
 
     if(typeof window.DOMParser != "undefined") 
     {
         xmlhttp=new XMLHttpRequest();
-        //xmlhttp.open("GET",xmlFile,false);
-        xmlhttp.open("GET", "./xml/default_1.5.5.xml", false);
+        xmlhttp.open("GET",xmlFile,false);
         if (xmlhttp.overrideMimeType)
         {
             xmlhttp.overrideMimeType('application/xml');
         }
-//        xmlhttp.send();
+        xmlhttp.send(null);
         xmlDoc=xmlhttp.responseXML;
     }
     else
@@ -2008,7 +2006,7 @@ function saveXML(data, filename, type) {
         xmlDoc.load(xmlFile);
     }    
 */
-/*
+
     var xhr;// = new XMLHttpRequest();
     if (window.XMLHttpRequest) // code for IE7+, Firefox, Chrome, Opera, Safari
     {
@@ -2030,7 +2028,7 @@ function saveXML(data, filename, type) {
     // y = xmlDoc.getElementsByTagName("Parameters");//.childNodes[0];
     // x = y[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
     alert(x);    
-*/
+
     // var newDocument = oldDocument.implementation.createDocument(
     //     //oldDocument.namespaceURI, //namespace to use
     //     '/xml/default_1.5.5.xml',
