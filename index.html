@@ -1991,7 +1991,7 @@ function saveXML(data, filename, type) {
     if(typeof window.DOMParser != "undefined") 
     {
         xmlhttp=new XMLHttpRequest();
-        xmlhttp.open("GET",xmlFile,false);
+        xmlhttp.open("GET",xmlfile,false);
         if (xmlhttp.overrideMimeType)
         {
             xmlhttp.overrideMimeType('application/xml');
@@ -2003,7 +2003,7 @@ function saveXML(data, filename, type) {
     {
         xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
         xmlDoc.async="false";
-        xmlDoc.load(xmlFile);
+        xmlDoc.load(xmlfile);
     }    
 */
 
@@ -2016,7 +2016,7 @@ function saveXML(data, filename, type) {
     {
       xhr = new ActiveXObject("Microsoft.XMLHTTP");
     }
-    xhr.open("GET", xmlFile, false);
+    xhr.open("GET", xmlfile, false);
     xhr.send(null);
     var xmlDoc = xhr.responseXML;
     //var x = xmlDoc.getElementsByTagName("Parameters")[0].childNodes[0].nodeValue;
