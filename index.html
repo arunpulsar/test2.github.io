@@ -2017,7 +2017,7 @@ function saveXML(data, filename, type) {
       xhr = new ActiveXObject("Microsoft.XMLHTTP");
     }
     xhr.open("GET", xmlfile, false);
-    xhr.responseType = 'blob';
+    xhr.responseType = 'arraybuffer/blob';
     xhr.send(null);
     var xmlDoc = xhr.responseXML;
     //var x = xmlDoc.getElementsByTagName("Parameters")[0].childNodes[0].nodeValue;
