@@ -2020,8 +2020,8 @@ function saveXML(data, filename, type) {
     xhr.send(null);
     var xmlDoc = xhr.responseXML;
     //var x = xmlDoc.getElementsByTagName("Parameters")[0].childNodes[0].nodeValue;
-    // var parser = new DOMParser();
-    // var xmlDoc = parser.parseFromString(xhr.responseText, "application/xml");
+    var parser = new DOMParser();
+    var xmlDoc = parser.parseFromString(xhr.responseText, "application/xml");
 
     var x;    
     var y;
