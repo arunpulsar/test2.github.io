@@ -2017,19 +2017,24 @@ function saveXML(data, filename, type) {
       xhr = new ActiveXObject("Microsoft.XMLHTTP");
     }
     xhr.open("GET", xmlfile, false);
-    xhr.responseType = 'arraybuffer/blob';
     xhr.send(null);
     var xmlDoc = xhr.responseXML;
-    //var x = xmlDoc.getElementsByTagName("Parameters")[0].childNodes[0].nodeValue;
     var parser = new DOMParser();
     var xmlDoc = parser.parseFromString(xhr.responseText, "application/xml");
-    console.log(xmlDoc);
+    // console.log(xmlDoc);
 
-    var x;    
-    var y;
-    y = xmlDoc.getElementsByTagName("Parameters");//.childNodes[0];
-    x = y[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
-    alert(x);    
+    var param_title;    
+    var param_section;
+    param_title = xmlDoc.getElementsByTagName("Parameters");//.childNodes[0];
+    param_section = param_title[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
+    alert(param_section);    
+
+    //param_total = param_title[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
+    for(var i = 0; i < param_val[0]; i++)
+    {
+        param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue = param_val[i];
+        console.log(param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue + "\n");
+    }
 
     // var newDocument = oldDocument.implementation.createDocument(
     //     //oldDocument.namespaceURI, //namespace to use
