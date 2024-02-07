@@ -2043,8 +2043,10 @@ function saveXML(data, filename, type) {
     // );
     // var file = newDocument.appendChild(newNode);
 
-    //var file = new Blob([xmlDoc], {type: 'application/xml'});
-    var file = xmlDoc;
+
+    var xmlDocSring = new XMLSerializer();
+    var xmlString = xmlDocSring.serializeToString(xmlDoc);
+    var file = new Blob([xmlString], {type: 'application/xml'});
 
     if (window.navigator.msSaveOrOpenBlob) // IE10+
         window.navigator.msSaveOrOpenBlob(file, filename);
