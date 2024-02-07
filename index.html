@@ -1971,7 +1971,7 @@ function saveXML(data, filename, type) {
     filename = currentDate + '_' + currentHours + '_' + currentMins + '_' + currentSecs;
     //filename = `${(new Date().toJSON().slice(0,10))}_${(new Date().getHours().slice(-2))}_${(new Date().getMinutes().slice(-2))}_${(new Date().getSeconds().slice(-2))}`;
 
-    var file = new Blob([data], {type: 'application/xml'});
+    // var file = new Blob([data], {type: 'application/xml'});
 /*
     var rawFile = new XMLHttpRequest();
     rawFile.open("GET", xmlfile, false);
@@ -2041,7 +2041,7 @@ function saveXML(data, filename, type) {
     // );
     // var file = newDocument.appendChild(newNode);
 
-
+    var file = new Blob([xmlDoc], {type: 'application/xml'});
 
     if (window.navigator.msSaveOrOpenBlob) // IE10+
         window.navigator.msSaveOrOpenBlob(file, filename);
