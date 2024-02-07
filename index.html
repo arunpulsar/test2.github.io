@@ -2032,8 +2032,24 @@ function saveXML(data, filename, type) {
     //param_total = param_title[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
     for(var i = 0; i < param_val[0]; i++)
     {
-        param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue = param_val[i];
-        console.log(param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue + "\n");
+        if(param_num[i] == param_title[i + 1].getElementsByTagName("Parameter")[0].childNodes[0].nodeValue)
+        {
+            param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue = param_val[i];
+            param_title[i + 1].getElementsByTagName("Display_value")[0].childNodes[0].nodeValue = param_val[i];
+            console.log(param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue + "\n");
+        }
+        else  // For older versions
+        {
+            for(var j = i; j < param_val[0]; j++)
+            {
+                if(param_num[i] == param_title[j + 1].getElementsByTagName("Parameter")[0].childNodes[0].nodeValue)
+                {
+                    param_title[j + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue = param_val[i];
+                    param_title[j + 1].getElementsByTagName("Display_value")[0].childNodes[0].nodeValue = param_val[i];
+                    console.log(param_title[j + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue + "\n");
+                }
+            }
+        }
     }
 
     // var newDocument = oldDocument.implementation.createDocument(
