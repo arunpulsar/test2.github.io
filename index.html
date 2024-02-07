@@ -26,6 +26,7 @@
   <script src="index.js" defer></script>
   <script src="js/jquery-impromptu.js"></script>
   <script src="js/lang.js"></script>
+  <script src="js/param.js"></script>
 
   <style>
     .my_text
@@ -148,6 +149,8 @@ function sleep(ms) {
 
     var currentlang = localStorage.getItem('lang_select_List');
     var lang_map = lang_array.map(a => a.English);
+    var param_num = param_info.map(a => a.pnum);
+    var param_val = param_info.map(a => a.pvalue);
 
     // Resetting all the variables
     function reset_params() {
@@ -1777,6 +1780,8 @@ async function sendAT(cmd) {
       document.getElementById("btnp21").innerHTML = lang_map[10];
       document.getElementById("btnreadparam").innerHTML = lang_map[145];
       document.getElementById("btnwriteparam").innerHTML = lang_map[146];
+      document.getElementById("btnopenfile").innerHTML = lang_map[147];
+      document.getElementById("btnsavefile").innerHTML = lang_map[148];
       document.getElementById("bluetooth-parameters-label").innerHTML = lang_map[17];
       document.getElementById("bt-range-label1").innerHTML = lang_map[18];
       document.getElementById("deviceName").innerHTML = lang_map[19];
@@ -1935,7 +1940,7 @@ function myLoadFunction() {
  *
  * @returns {String}
  */
- function getMobileOperatingSystem() {
+function getMobileOperatingSystem() {
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
 
     // Windows Phone must come first because its UA also contains "Android"
@@ -1964,7 +1969,82 @@ function saveXML(data, filename, type) {
     var currentSecs = ('0'+today.getSeconds()).substr(-2);    
     filename = currentDate + '_' + currentHours + '_' + currentMins + '_' + currentSecs;
     //filename = `${(new Date().toJSON().slice(0,10))}_${(new Date().getHours().slice(-2))}_${(new Date().getMinutes().slice(-2))}_${(new Date().getSeconds().slice(-2))}`;
-    var file = new Blob([data], {type: 'text/xml'});
+
+    var file = new Blob([data], {type: 'application/xml'});
+
+    var xmlfile = "./xml/default_1.5.5.xml";
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", xmlfile, false);
+    rawFile.onreadystatechange = function () {
+      if(rawFile.readyState === 4)  {
+        if(rawFile.status === 200 || rawFile.status == 0) {
+          var allText = rawFile.responseText;
+          console.log(allText);
+        }
+      }
+    }
+    rawFile.send(null);
+
+/*
+    var xmlDoc;
+    var xmlfile = "file:///C:/a_cprog/DO NOT DELETE/test2/xml/default_1.5.5.xml";
+
+    if(typeof window.DOMParser != "undefined") 
+    {
+        xmlhttp=new XMLHttpRequest();
+        //xmlhttp.open("GET",xmlFile,false);
+        xmlhttp.open("GET", "./xml/default_1.5.5.xml", false);
+        if (xmlhttp.overrideMimeType)
+        {
+            xmlhttp.overrideMimeType('application/xml');
+        }
+//        xmlhttp.send();
+        xmlDoc=xmlhttp.responseXML;
+    }
+    else
+    {
+        xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+        xmlDoc.async="false";
+        xmlDoc.load(xmlFile);
+    }    
+*/
+/*
+    var xhr;// = new XMLHttpRequest();
+    if (window.XMLHttpRequest) // code for IE7+, Firefox, Chrome, Opera, Safari
+    {
+      xhr = new XMLHttpRequest();
+    }
+    else // code for IE6, IE5
+    {
+      xhr = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xhr.open("GET", "./xml/default_1.5.5.xml", false);
+    xhr.send();
+    var xmlDoc = xhr.responseXML;
+    var x = xmlDoc.getElementsByTagName("Parameters")[0].childNodes[0].nodeValue;
+    // var parser = new DOMParser();
+    // var xmlDoc = parser.parseFromString(xhr.responseText, "application/xml");
+
+    // var x;    
+    // var y;
+    // y = xmlDoc.getElementsByTagName("Parameters");//.childNodes[0];
+    // x = y[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
+    alert(x);    
+*/
+    // var newDocument = oldDocument.implementation.createDocument(
+    //     //oldDocument.namespaceURI, //namespace to use
+    //     '/xml/default_1.5.5.xml',
+    //     null,                     //name of the root element (or for empty document)
+    //     null                      //doctype (null for XML)
+    // );
+    // var newNode = newDocument.importNode(
+    //     oldDocument.documentElement, //node to import
+    //     true                         //clone its descendants
+    // );
+    // var file = newDocument.appendChild(newNode);
+
+
+
     if (window.navigator.msSaveOrOpenBlob) // IE10+
         window.navigator.msSaveOrOpenBlob(file, filename);
     else { // Others
@@ -1998,25 +2078,14 @@ function saveXML(data, filename, type) {
     }
 }
 
-let getXMLFile = function(path, callback){
-            let request = new XMLHttpRequest();
-            request.open("GET", path);
-            request.setRequestHeader("Read_Write", "text/xml");
-            request.onreadystatechange = function(){
-                if(request.readyState === 4 && request.status === 200) {
-                  callback(request.responseXML);
-                }
-                request.send();
-            };
-};
-
-function CreateNewReport() 
+function openXML() 
 {
     if (window.File && window.FileReader && window.FileList && window.Blob) 
     {
         //debugger;
-        var x;    
-        var y;
+        var param_title;    
+        var param_total;
+        //var param_section;
         var input = $(document.createElement('input'));
         input.attr("type", "file");
         input.attr("accept", ".xml");
@@ -2044,9 +2113,15 @@ function CreateNewReport()
                     var parsed = new DOMParser().parseFromString(e.target.result, "application/xml");
                     //console.log(parsed);
 
-                    y = parsed.getElementsByTagName("Parameters");
-                    x = y[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
-                    alert(x);
+                    param_title = parsed.getElementsByTagName("Parameters");
+                    //param_section = param_title[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
+                    //alert(param_section);
+                    param_total = param_title[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
+                    for(var i = 0; i < param_total; i++)
+                    {
+                        param_val[i] = param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
+                        //console.log(i + ". " + param_num[i] + ":" + param_val[i] + "\n");
+                    }
                 };
             })(file);
 
@@ -2066,186 +2141,6 @@ function CreateNewReport()
     }
     return true;    
 }
-
-$(function() {
-     $("#fileInput").change(function (){
-
-        //var input = $(this).val();
-        //console.log(input.toString());
-
-        var input = $(document.createElement('input'));
-    input.attr("type", "file");
-    input.attr("id", "fileName");
-
-    input[0].onchange = function (e) {
-
-        debugger;
-        var file = input[0].files[0];
-        var reader = new FileReader();
-
-        // Closure to capture the file information.
-        reader.onload = (function (theFile) {
-            return function (e) {
-
-              var parsed = new DOMParser().parseFromString(this.result, "text/xml");
-              console.log(parsed);
-
-                // debugger;
-                // var sXml = e.target.result;
-                // var eXml = encodeURIComponent(sXml);
-
-                // var postData = {
-
-                //     reportXmlLayout: eXml
-                // };
-                // console.log(postData);
-                // OpenNewWindow(postData, "ReportDesign/LoadLayoutFromXML");                    
-            };
-        })(file);
-
-        if (file == null)
-            alert('File not loaded');
-        else
-            // Read in the file as a data URL.
-            reader.readAsText(file);
-    };
-
-    input.trigger('click'); // opening dialog
-
-    return false;        
-
-        // if (window.XMLHttpRequest)
-        // {// code for IE7+, Firefox, Chrome, Opera, Safari
-        // xmlhttp=new XMLHttpRequest();
-        // }
-        // else
-        // {// code for IE6, IE5
-        // xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-        // }
-        // xmlhttp.open("GET",fileName,false);
-        // xmlhttp.send();
-        // xmlDoc=xmlhttp.responseXML; 
-
-        // x=xmlDoc.getElementsByTagName("Parameters");
-        // i=0;
-
-        // function displayCD()
-        // {
-        // username=(x[i].getElementsByTagName("Parameters")[0].childNodes[0].nodeValue);
-        // alert(username);
-        // }
-
-
-
-
-
-
-        //getXMLFile(fileName, function(xml) {
-        //  console.log(xml);
-        //});
-       //submit form or whatever
-     });
-  });
-
-function chooseFile() {
-     $("#fileInput").click();
-     return false;
-}
-
-function ProcessNode(ANode)
-{
-  var FID, Attrs, i, Attr, ChildNodes;
-  
-  // Create a log folder for each node and activate the folder
-  FID = Log.CreateFolder(ANode.nodeName);
-  Log.PushLogFolder(FID);
-
-  // If the node value is not null, output it
-  if( aqObject.GetVarType(ANode.nodeValue) != 1)
-    Log.Message("Value: " + aqConvert.VarToStr(ANode.nodeValue));
-       
-  // Process the node's attributes
-  
-  // Exclude helper nodes from processing
-  if( ANode.nodeName.charAt(0) != "\#")
-  {
-    // Obtain the attribute collection and
-    // output the attributes to the log
-    Attrs = ANode.attributes;
-    for(i = 0; i < Attrs.length; i++)
-    {
-      Attr = Attrs.item(i);
-      Log.Message("Attr " + Attr.nodeName + ": " + Attr.nodeValue);
-    }
-  }
-    
-  // Obtain the collection of child nodes
-  ChildNodes = ANode.childNodes;
-  // Processes each node of the collection
-  for(i = 0; i < ChildNodes.length; i++)
-     ProcessNode(ChildNodes.item(i));
-  
-  // Close the log folder
-  Log.PopLogFolder();
-}
-
-// Function to open an XML file
-function openXML() {
-  var Doc, Node, s;
-  const xmlfile = document.getElementById('fileInput').click();
-  const xmlDocument = new DOMParser().parseFromString(xmlfile, "text/xml");
-  console.log(xmlDocument);
-  /*
-  // Create a COM object
-  // If you have MSXML 4:
-  Doc = Sys.OleObject("Msxml2.DOMDocument.4.0");
-  // If you have MSXML 6:
-  Doc = Sys.OleObject("Msxml2.DOMDocument.6.0");
-  Doc.async = false;
-  Doc.load(xmlfile);
-  Doc.setProperty("ProhibitDTD", false);
-
-  // Report an error, if, for instance, the markup or file structure is invalid
-  if(Doc.parseError.errorCode != 0)
-  {
-    s = "Reason:\t" + Doc.parseError.reason + "\n" +
-        "Line:\t" + aqConvert.VarToStr(Doc.parseError.line) + "\n" +
-        "Pos:\t" + aqConvert.VarToStr(Doc.parseError.linePos) + "\n" +
-        "Source:\t" + Doc.parseError.srcText;
-    // Post an error to the log and exit
-    Log.Error("Cannot parse the document.", s);
-    return;
-  }
-  // Obtain the node
-  Node = Doc.documentElement;
- 
-  // Process the node
-  ProcessNode(Node);
-
-    // var currentDate = `${(new Date().toJSON().slice(0,10))}`;
-    // var today = new Date();
-    // var currentHours = ('0'+today.getHours()).substr(-2);     
-    // var currentMins = ('0'+today.getMinutes()).substr(-2);     
-    // var currentSecs = ('0'+today.getSeconds()).substr(-2);    
-    // filename = currentDate + '_' + currentHours + '_' + currentMins + '_' + currentSecs;
-    // //filename = `${(new Date().toJSON().slice(0,10))}_${(new Date().getHours().slice(-2))}_${(new Date().getMinutes().slice(-2))}_${(new Date().getSeconds().slice(-2))}`;
-    // var file = new Blob([data], {type: 'text/xml'});
-    // if (window.navigator.msSaveOrOpenBlob) // IE10+
-    //     window.navigator.msSaveOrOpenBlob(file, filename);
-    // else { // Others
-    //     var a = document.createElement("a"),
-    //             url = URL.createObjectURL(file);
-    //     a.href = url;
-    //     a.download = filename;
-    //     document.body.appendChild(a);
-    //     a.click();
-    //     setTimeout(function() {
-    //         document.body.removeChild(a);
-    //         window.URL.revokeObjectURL(url);  
-    //     }, 0); 
-    // } */
-}
-
   </script>
   
 
@@ -2505,13 +2400,7 @@ function openXML() {
     color: red;
     font-style: italic;
     font-weight: normal;
-
-  .custom-file-upload {
-    border: 1px solid #ccc;
-    display: inline-block;
-    padding: 6px 12px;
-    cursor: pointer;
-}
+  }
 </style>
 
 
@@ -3343,23 +3232,8 @@ function openXML() {
               <td></td>
               <td><button type="button" id="btnwriteparam" class="button" onclick="button_press = 31; write_param();">WRITE PARAMS</button></td>
             </tr>
-            <tr>
-
-              
-              <!-- <td><button type="button" id="btnopenfile" class="file" name="attachement" />OPEN FILE</button></td> -->
-              <!-- <td><label for="inputId">OPEN FILE</label><input id="inputId" type="file" style="position: fixed; top: -100em"></td> -->
-              <!-- <td>
-                <label class="custom-file-upload">
-                  <input type="file" />
-                  Custom Upload
-              </label>
-              </td> -->
-              <!-- <td><input type="button" id="my-button" value="Select Files">
-                <input type="file" name="my_file" id="my-file"></td> -->
-                
-                <!-- <input id="fileInput" type="file" accept="text/xml" style="display:none;" /> -->
-                <!-- <td><input type="button" class="button" value="OPEN FILE" onclick="button_press = 32; openXML();/*document.getElementById('fileInput').click();*/" /></td> -->
-                <td><button type="button" class="button" value="OPEN FILE" onclick="button_press = 32; CreateNewReport();/*chooseFile();*/">OPEN FILE</button></td>
+            <tr>              
+              <td><button type="button" id="btnopenfile" class="button" onclick="button_press = 32; openXML();">OPEN FILE</button></td>
               <td></td>
               <td><button type="button" id="btnsavefile" class="button" onclick="button_press = 33; saveXML();">SAVE FILE</button></td>
             </tr>            
@@ -3376,6 +3250,8 @@ function openXML() {
               document.getElementById("btnp21").innerHTML = lang_map[10];
               document.getElementById("btnreadparam").innerHTML = lang_map[145];
               document.getElementById("btnwriteparam").innerHTML = lang_map[146];
+              document.getElementById("btnopenfile").innerHTML = lang_map[147];
+              document.getElementById("btnsavefile").innerHTML = lang_map[148];
               document.getElementById("bluetooth-parameters-label").innerHTML = lang_map[17];
               document.getElementById("bt-range-label1").innerHTML = lang_map[18];
               document.getElementById("deviceName").innerHTML = lang_map[19];

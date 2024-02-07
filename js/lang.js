@@ -1,4 +1,4 @@
-var lang_array = [
+const lang_array = [
     {	//Index 0	
         English: "REFLECT",
         German: "REFLECT",
@@ -595,4 +595,12 @@ var lang_array = [
         English: "WRITE PARAMS",
         German: "SCHREIBEN SIE PARAM",
     },        
+    {   //Index 147
+        English: "OPEN FILE",
+        German: "DATEI ÖFFNEN",
+    },
+    {   //Index 148
+        English: "SAVE FILE",
+        German: "DATEI SPEICHERN",
+    },          
 ];
