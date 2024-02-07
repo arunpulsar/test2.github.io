@@ -2016,17 +2016,17 @@ function saveXML(data, filename, type) {
     {
       xhr = new ActiveXObject("Microsoft.XMLHTTP");
     }
-    xhr.open("GET", "./xml/default_1.5.5.xml", false);
-    xhr.send();
+    xhr.open("GET", xmlFile, false);
+    xhr.send(null);
     var xmlDoc = xhr.responseXML;
-    var x = xmlDoc.getElementsByTagName("Parameters")[0].childNodes[0].nodeValue;
+    //var x = xmlDoc.getElementsByTagName("Parameters")[0].childNodes[0].nodeValue;
     // var parser = new DOMParser();
     // var xmlDoc = parser.parseFromString(xhr.responseText, "application/xml");
 
-    // var x;    
-    // var y;
-    // y = xmlDoc.getElementsByTagName("Parameters");//.childNodes[0];
-    // x = y[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
+    var x;    
+    var y;
+    y = xmlDoc.getElementsByTagName("Parameters");//.childNodes[0];
+    x = y[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
     alert(x);    
 
     // var newDocument = oldDocument.implementation.createDocument(
