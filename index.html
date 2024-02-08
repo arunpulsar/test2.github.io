@@ -2061,18 +2061,15 @@ function saveXML(data, filename, type) {
     var xmlString = xmlDocSring.serializeToString(xmlDoc);
     var file = new Blob([xmlString], {type: 'application/xml'});
 
-    var ISmobileDevice = getMobileOperatingSystem();
-        alert(ISmobileDevice.toString());    
-
 //    saveAs(file, filename);
 
     if (window.navigator.msSaveOrOpenBlob) // IE10+
         window.navigator.msSaveOrOpenBlob(file, filename);
     else 
     { // Others
-        // var ISmobileDevice = getMobileOperatingSystem();
-        // alert(ISmobileDevice.toString());
-        if(ISmobileDevice == "iOS")
+        //var ISmobileDevice = getMobileOperatingSystem();
+        //alert(ISmobileDevice.toString());
+/*         if(ISmobileDevice == "iOS")
         {
           if (file !== null) {
             window.URL.revokeObjectURL(file);
@@ -2086,7 +2083,7 @@ function saveXML(data, filename, type) {
             }, false);
         }
         else
-        {
+        { */
           var a = document.createElement("a"),
                   url = URL.createObjectURL(file);
           a.href = url;
@@ -2097,7 +2094,7 @@ function saveXML(data, filename, type) {
               document.body.removeChild(a);
               window.URL.revokeObjectURL(url);  
           }, 0); 
-      }
+        // }
     }
   }
   catch(err)
