@@ -2061,9 +2061,9 @@ function saveXML(data, filename, type) {
     var xmlString = xmlDocSring.serializeToString(xmlDoc);
     var file = new Blob([xmlString], {type: 'application/xml'});
 
-    saveAs(file, filename);
+//    saveAs(file, filename);
 
-/*     if (window.navigator.msSaveOrOpenBlob) // IE10+
+    if (window.navigator.msSaveOrOpenBlob) // IE10+
         window.navigator.msSaveOrOpenBlob(file, filename);
     else 
     { // Others
@@ -2094,7 +2094,7 @@ function saveXML(data, filename, type) {
               window.URL.revokeObjectURL(url);  
           }, 0); 
       }
-    } */
+    }
   }
   catch(err)
   {
