@@ -1963,6 +1963,8 @@ function getMobileOperatingSystem() {
 
 // Function to save data to a file
 function saveXML(data, filename, type) {
+  try
+  {
     var currentDate = `${(new Date().toJSON().slice(0,10))}`;
     var today = new Date();
     var currentHours = ('0'+today.getHours()).substr(-2);     
@@ -2025,10 +2027,10 @@ function saveXML(data, filename, type) {
 
     var param_title;
     var param_total;
-    var param_section;
+    //var param_section;
     param_title = xmlDoc.getElementsByTagName("Parameters");//.childNodes[0];
-    param_section = param_title[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
-    alert(param_section);    
+    //param_section = param_title[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
+    //alert(param_section);    
 
     param_total = param_title[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
     for(var i = 0; i < param_total; i++)
@@ -2037,7 +2039,7 @@ function saveXML(data, filename, type) {
         {
             param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue = param_val[i];
             param_title[i + 1].getElementsByTagName("Display_value")[0].childNodes[0].nodeValue = param_val[i];
-            console.log(param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue + "\n");
+            //console.log(param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue + "\n");
         }
     }
 
@@ -2089,10 +2091,17 @@ function saveXML(data, filename, type) {
           }, 0); 
       }
     }
+  }
+  catch(err)
+  {
+    alert(err.message);
+  }
 }
 
 function openXML() 
 {
+  try
+  {
     if (window.File && window.FileReader && window.FileList && window.Blob) 
     {
         //debugger;
@@ -2171,7 +2180,12 @@ function openXML()
     {
         alert('The File APIs are not fully supported by your browser.');
     }
-    return true;    
+    return true;  
+  }
+  catch(err)
+  {
+    alert(err.message);
+  }  
 }
   </script>
   
