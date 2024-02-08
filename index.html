@@ -2061,14 +2061,17 @@ function saveXML(data, filename, type) {
     var xmlString = xmlDocSring.serializeToString(xmlDoc);
     var file = new Blob([xmlString], {type: 'application/xml'});
 
+    var ISmobileDevice = getMobileOperatingSystem();
+        alert(ISmobileDevice.toString());    
+
 //    saveAs(file, filename);
 
     if (window.navigator.msSaveOrOpenBlob) // IE10+
         window.navigator.msSaveOrOpenBlob(file, filename);
     else 
     { // Others
-        var ISmobileDevice = getMobileOperatingSystem();
-        alert(ISmobileDevice.toString());
+        // var ISmobileDevice = getMobileOperatingSystem();
+        // alert(ISmobileDevice.toString());
         if(ISmobileDevice == "iOS")
         {
           if (file !== null) {
