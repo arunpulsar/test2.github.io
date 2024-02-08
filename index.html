@@ -27,6 +27,7 @@
   <script src="js/jquery-impromptu.js"></script>
   <script src="js/lang.js"></script>
   <script src="js/param.js"></script>
+  <script src="js/FileSaver.js"></script>
 
   <style>
     .my_text
@@ -2060,9 +2061,12 @@ function saveXML(data, filename, type) {
     var xmlString = xmlDocSring.serializeToString(xmlDoc);
     var file = new Blob([xmlString], {type: 'application/xml'});
 
-    if (window.navigator.msSaveOrOpenBlob) // IE10+
+    saveAs(file, filename);
+
+/*     if (window.navigator.msSaveOrOpenBlob) // IE10+
         window.navigator.msSaveOrOpenBlob(file, filename);
-    else { // Others
+    else 
+    { // Others
         var ISmobileDevice = getMobileOperatingSystem();
         if(ISmobileDevice == "iOS")
         {
@@ -2090,7 +2094,7 @@ function saveXML(data, filename, type) {
               window.URL.revokeObjectURL(url);  
           }, 0); 
       }
-    }
+    } */
   }
   catch(err)
   {
