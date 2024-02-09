@@ -602,5 +602,17 @@ const lang_array = [
     {   //Index 148
         English: "SAVE FILE",
         German: "DATEI SPEICHERN",
-    },          
+    },        
+    {   //Index 149
+        English: "File not loaded",
+        German: "Datei nicht geladen",
+    },      
+    {   //Index 150
+        English: "The File APIs are not fully supported by your browser.",
+        German: "Die Datei-APIs werden von Ihrem Browser nicht vollständig unterstützt.",
+    },       
+    {   //Index 151
+        English: "Loaded file: ",
+        German: "Geladene Datei: ",
+    },           
 ];

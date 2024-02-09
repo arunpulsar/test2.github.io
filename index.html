@@ -2123,7 +2123,9 @@ function openXML()
             //debugger;
             var file = input[0].files[0];
             var reader = new FileReader();
-
+            // console.log(file.name.toString());
+            // let textarea4 = document.getElementById('file-name');
+            // textarea4.value = file.name;
             // Closure to capture the file information.
             reader.onload = (function (theFile) 
             {
@@ -2172,10 +2174,14 @@ function openXML()
             })(file);
 
             if (file == null)
-                alert('File not loaded');
+                alert(lang_map[149]);
             else
+            {
                 // Read in the file as a data URL.
                 reader.readAsText(file);
+                alert(lang_map[151] + file.name);
+                log(lang_map[151] + file.name);
+            }
         };
 
         input.trigger('click'); // opening dialog
@@ -2183,7 +2189,7 @@ function openXML()
     }
     else 
     {
-        alert('The File APIs are not fully supported by your browser.');
+        alert(lang_map[150]);
     }
     return true;  
   }
@@ -2270,6 +2276,26 @@ function openXML()
         margin: 4px 2px;
         cursor: pointer;
         resize: none;
+        left:10px;
+	} 
+  .textarea3 {
+        background-color: transparent;
+        /* border: none; */
+        border-color: transparent;
+        /* color: white; */
+        /* padding: 10px 30px; */
+        height:  170px;
+        width:  500px;
+        text-align: left;
+        text-decoration: none;
+        display: inline-block;
+        font-family:'Segoe UI SemiBold';  
+        font-size: 24pt;
+        font-weight: 500; 
+        margin: 4px 2px;
+        cursor: pointer;
+        resize: none;
+        outline: none;
         left:10px;
 	} 
   .label_default {
@@ -3286,6 +3312,8 @@ function openXML()
             <tr>              
               <td><button type="button" id="btnopenfile" class="button" onclick="button_press = 32; openXML();">OPEN FILE</button></td>
               <td></td>
+              <!-- File Name displayed in text area does not look good -->
+              <!-- <td><textarea id="file-name" class="textarea3" rows="1" cols="8" style="font-size: 24pt; font-weight: 500; width:270px; height:80px;" readonly></textarea></td> -->
               <td><button type="button" id="btnsavefile" class="button" onclick="button_press = 33; saveXML();">SAVE FILE</button></td>
             </tr>            
             <script>
