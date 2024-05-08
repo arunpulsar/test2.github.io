@@ -1,4 +1,4 @@
-const lang_array = [
+var lang_array = [
     {	//Index 0	
         English: "REFLECT",
         German: "REFLECT",
@@ -587,32 +587,4 @@ const lang_array = [
         English: "Setting new Bluetooth device name. Please wait...",
         German: "Neuen Bluetooth-Gerätenamen festlegen. Bitte Warten...",
     },
-    {   //Index 145
-        English: "READ PARAMS",
-        German: "PARAM LESEN",
-    },
-    {   //Index 146
-        English: "WRITE PARAMS",
-        German: "SCHREIBEN SIE PARAM",
-    },        
-    {   //Index 147
-        English: "OPEN FILE",
-        German: "DATEI ÖFFNEN",
-    },
-    {   //Index 148
-        English: "SAVE FILE",
-        German: "DATEI SPEICHERN",
-    },        
-    {   //Index 149
-        English: "File not loaded",
-        German: "Datei nicht geladen",
-    },      
-    {   //Index 150
-        English: "The File APIs are not fully supported by your browser.",
-        German: "Die Datei-APIs werden von Ihrem Browser nicht vollständig unterstützt.",
-    },       
-    {   //Index 151
-        English: "Loaded file: ",
-        German: "Geladene Datei: ",
-    },           
 ];

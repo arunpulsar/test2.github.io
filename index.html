@@ -3,14 +3,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Test2 Bluetooth Remote Access</title>
+  <title>Pulsar Bluetooth Remote Access</title>
   <link rel="stylesheet" href="css/normalize.min.css">
   <noscript>
     <link rel="stylesheet" href="css/skel-noscript.css" />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/style-desktop.css" />
-  </noscript> 
-  <link rel="manifest" href="manifest.json"> 
+  </noscript>  
   <link rel="stylesheet" href="css/style-lr.css">
   <link href="css/style.css" rel="stylesheet">
   <link href="css/slider.css" rel="stylesheet">
@@ -26,8 +25,6 @@
   <script src="index.js" defer></script>
   <script src="js/jquery-impromptu.js"></script>
   <script src="js/lang.js"></script>
-  <script src="js/param.js"></script>
-  <!-- <script src="js/FileSaver.js"></script> -->
 
   <style>
     .my_text
@@ -104,7 +101,7 @@ function sleep(ms) {
     var button_press = 0;
     var isTraceOn = 0;
     var level_var, distance_var, volume_var, compensated_var, compensated_var_m, mA_output_var, temperature_var, date_var, time_var, gate_start, gate_stop, echo_var, noise_var, status_var, near_blanking_var, far_blanking_var, empty_distance, mode_var, bit0, bit1, bit2, bit3, bit4, bit5, bit6, bit7;
-    var p104_units_val, p605_units_val, p104_units, p605_units, p104_rx_status, p605_rx_status, cmd_sent, param_init_query, power_init_query, p104_param_update;
+    var p104_units_val, p605_units_val, p104_units, p605_units, p104_rx_status, p605_rx_status, cmd_sent, param_init_query, power_init_query, p104_param_update, span_val;
     level_var = 0.000;//4.346;
     distance_var = 0.000;//1.654;
     volume_var = 0.000;//2.370;
@@ -134,6 +131,7 @@ function sleep(ms) {
     param_init_query = 0;
     power_init_query = 0;
     p104_param_update = 0;
+    span_val = 5.7;
 
     // set interval
     var echo_tid;
@@ -150,9 +148,6 @@ function sleep(ms) {
 
     var currentlang = localStorage.getItem('lang_select_List');
     var lang_map = lang_array.map(a => a.English);
-    var param_num = param_info.map(a => a.pnum);
-    var param_val = param_info.map(a => a.pvalue);
-    const xmlfile = "./xml/default_1.5.5.xml";
 
     // Resetting all the variables
     function reset_params() {
@@ -193,6 +188,7 @@ function sleep(ms) {
       param_init_query = 0;
       power_init_query = 0;
       p104_param_update = 0;
+      span_val = 5.7;
     }
 
     // Function to select the volume units to be displayed depending on p605 value
@@ -714,9 +710,13 @@ function sleep(ms) {
         {
           mode_var = 20.0;
         }
-        else
+        else if(compensated_var_m.toFixed(1) == 9.6)
         {
           mode_var = 8.0;
+        }
+        else
+        {
+          mode_var = 40.0;
         }
         far_blanking_dist = empty_distance * (100.0 + far_blanking_var)/100.0;
         near_blanking_var = convert_to_measurement_units(near_blanking_var);
@@ -889,6 +889,7 @@ function sleep(ms) {
       }
       else if(string_val.includes("/P106:")) {
         document.getElementById('p106-box').value = string_val.slice(string_val.lastIndexOf(':') + 1);//string_val.substring(string_val.indexOf(':') + 1);
+        span_val = convert_to_mtrs(document.getElementById('p106-box').value);
         param_query = 5;
         if((param_start_val == 0) || (param_tid == false))
           settings_msg_clear();
@@ -1780,10 +1781,6 @@ async function sendAT(cmd) {
       document.getElementById("btnp808").innerHTML = lang_map[10];
       document.getElementById("btnp605").innerHTML = lang_map[10];
       document.getElementById("btnp21").innerHTML = lang_map[10];
-      document.getElementById("btnreadparam").innerHTML = lang_map[145];
-      document.getElementById("btnwriteparam").innerHTML = lang_map[146];
-      document.getElementById("btnopenfile").innerHTML = lang_map[147];
-      document.getElementById("btnsavefile").innerHTML = lang_map[148];
       document.getElementById("bluetooth-parameters-label").innerHTML = lang_map[17];
       document.getElementById("bt-range-label1").innerHTML = lang_map[18];
       document.getElementById("deviceName").innerHTML = lang_map[19];
@@ -1936,268 +1933,6 @@ function myLoadFunction() {
     }
 }
 
-/**
- * Determine the mobile operating system.
- * This function returns one of 'iOS', 'Android', 'Windows Phone', or 'unknown'.
- *
- * @returns {String}
- */
-function getMobileOperatingSystem() {
-    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
-    // Windows Phone must come first because its UA also contains "Android"
-    if (/windows phone/i.test(userAgent)) {
-        return "WindowsPhone";
-    }
-
-    if (/android/i.test(userAgent)) {
-        return "Android";
-    }
-
-    // iOS detection
-    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-        return "iOS";
-    }
-
-    return "unknown";
-}
-
-// Function to save data to a file
-function saveXML(data, filename, type) {
-  try
-  {
-    var currentDate = `${(new Date().toJSON().slice(0,10))}`;
-    var today = new Date();
-    var currentHours = ('0'+today.getHours()).substr(-2);     
-    var currentMins = ('0'+today.getMinutes()).substr(-2);     
-    var currentSecs = ('0'+today.getSeconds()).substr(-2);    
-    filename = currentDate + '_' + currentHours + '_' + currentMins + '_' + currentSecs;
-    //filename = `${(new Date().toJSON().slice(0,10))}_${(new Date().getHours().slice(-2))}_${(new Date().getMinutes().slice(-2))}_${(new Date().getSeconds().slice(-2))}`;
-
-    // var file = new Blob([data], {type: 'application/xml'});
-/*
-    var rawFile = new XMLHttpRequest();
-    rawFile.open("GET", xmlfile, false);
-    rawFile.onreadystatechange = function () {
-      if(rawFile.readyState === 4)  {
-        if(rawFile.status === 200 || rawFile.status == 0) {
-          var allText = rawFile.responseText;
-          console.log(allText);
-        }
-      }
-    }
-    rawFile.send(null);
-*/
-/*
-    var xmlDoc;
-
-    if(typeof window.DOMParser != "undefined") 
-    {
-        xmlhttp=new XMLHttpRequest();
-        xmlhttp.open("GET",xmlfile,false);
-        if (xmlhttp.overrideMimeType)
-        {
-            xmlhttp.overrideMimeType('application/xml');
-        }
-        xmlhttp.send(null);
-        xmlDoc=xmlhttp.responseXML;
-    }
-    else
-    {
-        xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
-        xmlDoc.async="false";
-        xmlDoc.load(xmlfile);
-    }    
-*/
-
-    var xhr;// = new XMLHttpRequest();
-    if (window.XMLHttpRequest) // code for IE7+, Firefox, Chrome, Opera, Safari
-    {
-      xhr = new XMLHttpRequest();
-    }
-    else // code for IE6, IE5
-    {
-      xhr = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    xhr.open("GET", xmlfile, false);
-    xhr.send(null);
-    var xmlDoc = xhr.responseXML;
-    var parser = new DOMParser();
-    var xmlDoc = parser.parseFromString(xhr.responseText, "application/xml");
-    // console.log(xmlDoc);
-
-    var param_title;
-    var param_total;
-    //var param_section;
-    param_title = xmlDoc.getElementsByTagName("Parameters");//.childNodes[0];
-    //param_section = param_title[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
-    //alert(param_section);    
-
-    param_total = param_title[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
-    for(var i = 0; i < param_total; i++)
-    {
-        if(param_num[i] == param_title[i + 1].getElementsByTagName("Parameter")[0].childNodes[0].nodeValue) // Redundant check. But safer.
-        {
-            param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue = param_val[i];
-            param_title[i + 1].getElementsByTagName("Display_value")[0].childNodes[0].nodeValue = param_val[i];
-            //console.log(param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue + "\n");
-        }
-    }
-
-    // var newDocument = oldDocument.implementation.createDocument(
-    //     //oldDocument.namespaceURI, //namespace to use
-    //     '/xml/default_1.5.5.xml',
-    //     null,                     //name of the root element (or for empty document)
-    //     null                      //doctype (null for XML)
-    // );
-    // var newNode = newDocument.importNode(
-    //     oldDocument.documentElement, //node to import
-    //     true                         //clone its descendants
-    // );
-    // var file = newDocument.appendChild(newNode);
-
-
-    var xmlDocSring = new XMLSerializer();
-    var xmlString = xmlDocSring.serializeToString(xmlDoc);
-    var file = new Blob([xmlString], {type: 'application/xml'});
-
-//    saveAs(file, filename);
-
-    if (window.navigator.msSaveOrOpenBlob) // IE10+
-        window.navigator.msSaveOrOpenBlob(file, filename);
-    else 
-    { // Others
-        //var ISmobileDevice = getMobileOperatingSystem();
-        //alert(ISmobileDevice.toString());
-/*         if(ISmobileDevice == "iOS")
-        {
-          if (file !== null) {
-            window.URL.revokeObjectURL(file);
-          }
-          textFile = window.URL.createObjectURL(data);
-
-          document.getElementById('textbox').addEventListener('input', function() {
-              var link = document.getElementById('downloadlink');
-              link.href = textFile;//makeTextFile(textbox.value);
-              link.style.display = 'block';
-            }, false);
-        }
-        else
-        { */
-          var a = document.createElement("a"),
-                  url = URL.createObjectURL(file);
-          a.href = url;
-          a.download = filename;
-          document.body.appendChild(a);
-          a.click();
-          setTimeout(function() {
-              document.body.removeChild(a);
-              window.URL.revokeObjectURL(url);  
-          }, 0); 
-        // }
-    }
-  }
-  catch(err)
-  {
-    alert(err.message);
-  }
-}
-
-function openXML() 
-{
-  try
-  {
-    if (window.File && window.FileReader && window.FileList && window.Blob) 
-    {
-        //debugger;
-        var param_title;    
-        var param_total;
-        //var param_section;
-        var input = $(document.createElement('input'));
-        input.attr("type", "file");
-        input.attr("accept", ".xml");
-        input.attr("id", "fileName");
-
-        input[0].onchange = function (e) 
-        {
-            //debugger;
-            var file = input[0].files[0];
-            var reader = new FileReader();
-            // console.log(file.name.toString());
-            // let textarea4 = document.getElementById('file-name');
-            // textarea4.value = file.name;
-            // Closure to capture the file information.
-            reader.onload = (function (theFile) 
-            {
-                return function (e) 
-                {
-                    //debugger;
-                  /*  var sXml = e.target.result;
-                    var eXml = encodeURIComponent(sXml);
-                    var postData = {
-                        reportXmlLayout: eXml
-                    };
-                    OpenNewWindow(postData, "ReportDesign/LoadLayoutFromXML");                  
-                    */
-                    var parsed = new DOMParser().parseFromString(e.target.result, "application/xml");
-                    //console.log(parsed);
-
-                    param_title = parsed.getElementsByTagName("Parameters");
-                    //param_section = param_title[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
-                    //alert(param_section);
-                    param_total = param_title[1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
-                    for(var i = 0; i < param_total; i++)
-                    {
-                        /*
-                          param_val[i] = param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
-                          //console.log(i + ". " + param_num[i] + ":" + param_val[i] + "\n");
-                        */
-
-                        if(param_num[i] == param_title[i + 1].getElementsByTagName("Parameter")[0].childNodes[0].nodeValue)
-                        {
-                            param_val[i] = param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue;
-                            //console.log(i + ". " + param_num[i] + ":" + param_val[i] + "\n");
-                        }
-                        else  // For older versions (For missing parameters, skip and find the correct index)
-                        {
-                            for(var j = i; j < param_info.length; j++)
-                            {
-                                if(param_num[j] == param_title[i + 1].getElementsByTagName("Parameter")[0].childNodes[0].nodeValue)
-                                {
-                                    param_val[j] = param_title[i + 1].getElementsByTagName("Value")[0].childNodes[0].nodeValue ;
-                                    //console.log(j + ". " + param_num[j] + ":" + param_val[j] + "\n");
-                                }
-                            }
-                        }                    
-                    }
-                };
-            })(file);
-
-            if (file == null)
-                alert(lang_map[149]);
-            else
-            {
-                // Read in the file as a data URL.
-                reader.readAsText(file);
-                alert(lang_map[151] + file.name);
-                log(lang_map[151] + file.name);
-            }
-        };
-
-        input.trigger('click'); // opening dialog
-        return false;
-    }
-    else 
-    {
-        alert(lang_map[150]);
-    }
-    return true;  
-  }
-  catch(err)
-  {
-    alert(err.message);
-  }  
-}
   </script>
   
 
@@ -2210,7 +1945,7 @@ function openXML()
         color: white;
 	    /* padding: 15px 32px; */
         height:100px;
-        width:260px;/* For better alignment in Settings page, reduced from 268px */
+        width: 268px;
         /* width:160px; */
         text-align: center;
         text-decoration: none;
@@ -2276,26 +2011,6 @@ function openXML()
         margin: 4px 2px;
         cursor: pointer;
         resize: none;
-        left:10px;
-	} 
-  .textarea3 {
-        background-color: transparent;
-        /* border: none; */
-        border-color: transparent;
-        /* color: white; */
-        /* padding: 10px 30px; */
-        height:  170px;
-        width:  500px;
-        text-align: left;
-        text-decoration: none;
-        display: inline-block;
-        font-family:'Segoe UI SemiBold';  
-        font-size: 24pt;
-        font-weight: 500; 
-        margin: 4px 2px;
-        cursor: pointer;
-        resize: none;
-        outline: none;
         left:10px;
 	} 
   .label_default {
@@ -2623,7 +2338,7 @@ function openXML()
                         <h1>LOGIN</h1>            
                         <!-- <label for="email"><b>Email</b></label>
                         <input type="text" placeholder="Enter Email" name="email" required> -->
-                        <label for="psw" id="lblpsw" style="font-family:'Segoe UI Normal';  font-size: 24pt; font-style:Normal; font-weight:normal; height:50px; display: inline;"><b>Passcode</b></label>
+                        <label for="psw" id="lblpsw" style="font-family:'Segoe UI Normal';  font-size: 24pt; font-style:Normal; font-weight:normal; height:50px; display: inline;""><b>Passcode</b></label>
                         <input type="password" name ="pswbox" placeholder="Enter Passcode" id="pswbox" style="font-family:'Segoe UI SemiBold';  font-size: 24pt; font-weight: 500; " name="psw" onkeydown="search(this) " required>            
                         <button type="button" id="btnLogin" class="btn" style="font-family:'Segoe UI SemiBold';  font-size: 24pt; font-weight: 500;  " onclick="closeForm(); sendLoginCmd(); closeForm2();  ">LOGIN</button>
                         <!-- <button type="button" class="btn cancel" onclick="closeForm()">Close</button>  -->
@@ -2867,6 +2582,8 @@ function openXML()
               </td>                 
                 <!-- Offline mode -->
                 <script src="./js/chart.js"></script>
+                <script src="js/hammer.min.js"></script>
+                <script src="js/chartjs-plugin-zoom.min.js"></script>
                 <script>
                 // X points/labels
                 var xdata = [];
@@ -2924,6 +2641,8 @@ function openXML()
                         ctx.fillRect(x.getPixelForValue(0), top, near_blanking_var*width/compensated_var, height); // Near blanking area (x.getPixelForValue(0), top, 0.3*width/7.2, height)
                         ctx.fillStyle = 'yellow';
                         ctx.fillRect(x.getPixelForValue((200.0/1.2)*empty_distance/mode_var), top, width*(far_blanking_dist - empty_distance)/compensated_var, height); // Far blanking area
+                        ctx.fillStyle = '#EFFFE8';
+                        ctx.fillRect(x.getPixelForValue((200.0/1.2)*(empty_distance - span_val)/mode_var), top, span_val*width/compensated_var, height); // Span
                         ctx.strokeStyle = 'red';
                         ctx.strokeRect(x.getPixelForValue(distance_var*200/compensated_var), top, 0, height);  // Distance//(x0, y0, x1, y1); (x.getPixelForValue(distance_var*200/7.2), top, 0, height)
                         ctx.strokeStyle = 'black';
@@ -3003,6 +2722,34 @@ function openXML()
                                     size: 24,
                                 }
                             }
+                        },
+                        zoom: {
+                          zoom: {
+                            wheel: {
+                              enabled: true,
+                              mode: 'xy'
+                            },
+                            pinch: {
+                              enabled: true,
+                              mode: 'xy'
+                            },
+                            drag: {
+                              enabled: true,
+                              mode: 'y'
+                            },
+                            // mode: "x",
+                            // speed: 0.1,
+                            // threshold: 2,
+                            // sensitivity: 3,                        
+                          },
+                          pan: {
+                            enabled: true,
+                            mode: 'xy'
+                          },
+                          limits: {
+                            y: {min: 0, max: 1000},
+                            x: {min: 0, max: xdata.length}
+                          }
                         }
                       },
                     maintainAspectRatio: false,                                      
@@ -3304,18 +3051,6 @@ function openXML()
               <td><input type="text" id="p21-box" autocomplete="off" style="font-family:'Segoe UI SemiBold';  font-size: 24pt; font-weight: 500; width:270px; height:80px;" onkeydown="button_press = 26; wasEnter2(this);"></td>
               <td><button type="button" id="btnp21" class="button" onclick="button_press = 26; param_check();">UPDATE</button></td>
             </tr>
-            <tr>
-              <td><button type="button" id="btnreadparam" class="button" onclick="button_press = 30; read_param();">READ PARAMS</button></td>
-              <td></td>
-              <td><button type="button" id="btnwriteparam" class="button" onclick="button_press = 31; write_param();">WRITE PARAMS</button></td>
-            </tr>
-            <tr>              
-              <td><button type="button" id="btnopenfile" class="button" onclick="button_press = 32; openXML();">OPEN FILE</button></td>
-              <td></td>
-              <!-- File Name displayed in text area does not look good -->
-              <!-- <td><textarea id="file-name" class="textarea3" rows="1" cols="8" style="font-size: 24pt; font-weight: 500; width:270px; height:80px;" readonly></textarea></td> -->
-              <td><button type="button" id="btnsavefile" class="button" onclick="button_press = 33; saveXML();">SAVE FILE</button></td>
-            </tr>            
             <script>
               document.getElementById("btndeviceName").innerHTML = lang_map[10];
               document.getElementById("btnpWord").innerHTML = lang_map[10];
@@ -3327,10 +3062,6 @@ function openXML()
               document.getElementById("btnp808").innerHTML = lang_map[10];
               document.getElementById("btnp605").innerHTML = lang_map[10];
               document.getElementById("btnp21").innerHTML = lang_map[10];
-              document.getElementById("btnreadparam").innerHTML = lang_map[145];
-              document.getElementById("btnwriteparam").innerHTML = lang_map[146];
-              document.getElementById("btnopenfile").innerHTML = lang_map[147];
-              document.getElementById("btnsavefile").innerHTML = lang_map[148];
               document.getElementById("bluetooth-parameters-label").innerHTML = lang_map[17];
               document.getElementById("bt-range-label1").innerHTML = lang_map[18];
               document.getElementById("deviceName").innerHTML = lang_map[19];
@@ -3396,7 +3127,7 @@ function openXML()
             <p style="font-family:'Segoe UI Normal';  width: 115%; text-align:center; color:#ffffff; font-size:20pt;line-height:40px;">&copy; Pulsar Measurement 2023<br></p>
           </td>
           <td style=" text-align:center;font-size:24px;  background-color:rgb(51, 179, 74);;color:#2e2323;">
-            <p style="font-family:'Segoe UI Normal';  width: 0%; text-align:right; color:#ffffff; font-size:12pt;line-height:40px; font-style: italic;">v2.4.2<br></p>
+            <p style="font-family:'Segoe UI Normal';  width: 0%; text-align:right; color:#ffffff; font-size:12pt;line-height:40px; font-style: italic;">v2.0.0<br></p>
           </td>
         </tr>
       </table>
