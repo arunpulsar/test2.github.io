@@ -733,6 +733,18 @@ function sleep(ms) {
         myChart.data.labels = xdata;
         myChart.config.options.scales.x.title.text = p104_units;
         myChart.update();
+        // _this.myChart.options.scales.x.time.unit = options.unit;
+        // _this.myChart.options.scales.x.min = options.limits.x.min;
+        // _this.myChart.options.scales.x.max = options.limits.x.max;     
+        // _this.myChart.options.scales.x.time.displayFormats = options.formats;
+        // _this.myChart.options.plugins.zoom.limits.x.max = options.limits.x.min;
+        // _this.myChart.options.plugins.zoom.limits.x.max = options.limits.x.max;
+        // _this.myChart.options.scales.y.time.unit = options.unit;
+        // _this.myChart.options.scales.y.min = options.limits.y.min;
+        // _this.myChart.options.scales.y.max = options.limits.y.max;     
+        // _this.myChart.options.scales.y.time.displayFormats = options.formats;
+        // _this.myChart.options.plugins.zoom.limits.y.max = options.limits.y.min;
+        // _this.myChart.options.plugins.zoom.limits.y.max = options.limits.y.max
       }
       return a;
     }
@@ -2220,7 +2232,34 @@ function myLoadFunction() {
     sysState=cur_state;
   }
 
-  
+  function rescale() {
+    // arbitraryLine Plugin
+    var arbitraryLine = {       // Fills near & far blanking areas, Plots Distance, gate start and stop. Shows dynamic variables
+      id: 'arbitraryLine',
+      beforeDraw(chart, args, options) {
+          const ctx = chart.canvas.getContext('2d');
+          var { ctr, chartArea: {top, right, bottom, left, width, height}, scales:
+              {x, y} } = chart;
+          ctx.save();
+          //alert("Near = " + near_blanking_var + ", Far = " + far_blanking_dist + ", Empty = " + empty_distance + ", Compensated = " + compensated_var + ", Mode = " + mode_var);
+          ctx.fillStyle = 'yellow';
+          ctx.fillRect(x.getPixelForValue(0), top, near_blanking_var*width/compensated_var, height); // Near blanking area (x.getPixelForValue(0), top, 0.3*width/7.2, height)
+          ctx.fillStyle = 'yellow';
+          ctx.fillRect(x.getPixelForValue((200.0/1.2)*empty_distance/mode_var), top, width*(far_blanking_dist - empty_distance)/compensated_var, height); // Far blanking area
+          ctx.fillStyle = '#EFFFE8';
+          ctx.fillRect(x.getPixelForValue((200.0/1.2)*(empty_distance - span_val)/mode_var), top, span_val*width/compensated_var, height); // Span
+          ctx.strokeStyle = 'red';
+          ctx.strokeRect(x.getPixelForValue(distance_var*200/compensated_var), top, 0, height);  // Distance//(x0, y0, x1, y1); (x.getPixelForValue(distance_var*200/7.2), top, 0, height)
+          ctx.strokeStyle = 'black';
+          ctx.strokeRect(x.getPixelForValue(gate_start/5), top, 0, height);  // Gate start (x.getPixelForValue((distance_var - 0.20)*200/7.2), top, 0, height)
+          ctx.strokeStyle = 'black';
+          ctx.strokeRect(x.getPixelForValue(gate_stop/5), top, 0, height);  // Gate stop (x.getPixelForValue((distance_var + 0.20)*200/7.2), top, 0, height)
+          ctx.fillStyle = 'black';
+          data_log_update();                  
+          ctx.restore();
+      }
+    }
+  }
 
   </script>
 
@@ -2636,13 +2675,25 @@ function myLoadFunction() {
                         var { ctr, chartArea: {top, right, bottom, left, width, height}, scales:
                             {x, y} } = chart;
                         ctx.save();
+                        var start_point, width_val;
                         //alert("Near = " + near_blanking_var + ", Far = " + far_blanking_dist + ", Empty = " + empty_distance + ", Compensated = " + compensated_var + ", Mode = " + mode_var);
                         ctx.fillStyle = 'yellow';
-                        ctx.fillRect(x.getPixelForValue(0), top, near_blanking_var*width/compensated_var, height); // Near blanking area (x.getPixelForValue(0), top, 0.3*width/7.2, height)
-                        ctx.fillStyle = 'yellow';
-                        ctx.fillRect(x.getPixelForValue((200.0/1.2)*empty_distance/mode_var), top, width*(far_blanking_dist - empty_distance)/compensated_var, height); // Far blanking area
+                        //ctx.fillRect(x.getPixelForValue(0), top, near_blanking_var*width/compensated_var, height); // Near blanking area (x.getPixelForValue(0), top, 0.3*width/7.2, height)
+                        start_point = x.getPixelForValue(0);
+                        width_val = x.getPixelForValue(near_blanking_var*width/compensated_var) - x.getPixelForValue(0);
+                        ctx.fillRect(start_point, top, width_val, height);    // Near blanking area
                         ctx.fillStyle = '#EFFFE8';
-                        ctx.fillRect(x.getPixelForValue((200.0/1.2)*(empty_distance - span_val)/mode_var), top, span_val*width/compensated_var, height); // Span
+                        //ctx.fillRect(x.getPixelForValue((200.0/1.2)*(empty_distance - span_val)/mode_var), top, span_val*width/compensated_var, height); // Span
+                        start_point = x.getPixelForValue((200.0/1.2)*(empty_distance - span_val)/mode_var);
+                        width_val = x.getPixelForValue((200.0/1.2)*empty_distance/mode_var) - x.getPixelForValue((200.0/1.2)*(empty_distance - span_val)/mode_var);
+                        //width_val = x.getPixelForValue((200.0/1.2)*(span_val)/mode_var);
+                        ctx.fillRect(start_point, top, width_val, height);    // Span
+                        ctx.fillStyle = 'yellow';
+                        //ctx.fillRect(x.getPixelForValue((200.0/1.2)*empty_distance/mode_var), top, width*(far_blanking_dist - empty_distance)/compensated_var, height); // Far blanking area
+                        start_point = x.getPixelForValue((200.0/1.2)*empty_distance/mode_var);
+                        width_val = x.getPixelForValue((200.0/1.2)*far_blanking_dist/mode_var) - x.getPixelForValue((200.0/1.2)*empty_distance/mode_var);
+                        ctx.fillRect(start_point, top, width_val, height);    // Far blanking area
+                        console.log(empty_distance.toString() + ", " + span_val + ", " + mode_var);
                         ctx.strokeStyle = 'red';
                         ctx.strokeRect(x.getPixelForValue(distance_var*200/compensated_var), top, 0, height);  // Distance//(x0, y0, x1, y1); (x.getPixelForValue(distance_var*200/7.2), top, 0, height)
                         ctx.strokeStyle = 'black';
@@ -2738,8 +2789,8 @@ function myLoadFunction() {
                               mode: 'y'
                             },
                             // mode: "x",
-                            speed: 10,
-                            threshold: 2,
+                            speed: 0.10,
+                            threshold: 10,
                             sensitivity: 3,                        
                           },
                           pan: {
@@ -2747,10 +2798,10 @@ function myLoadFunction() {
                             mode: 'xy'
                           },
                           limits: {
-                            y: {min: 0, max: 1000},
-                            x: {min: 0, max: xdata.length}
+                            y: {minRange: 100, min: 0, max: 1000/*, minRange: 100*/},
+                            x: {minRange: 50, min: 0, max: xdata.length/*, minRange: 1000*/}
                           }
-                        }
+                        },
                       },
                     maintainAspectRatio: false,                                      
                     scales: {                                 
@@ -2780,7 +2831,7 @@ function myLoadFunction() {
                                 font: {
                                   size: 24,
                                 }
-                            },                     
+                            },              
                         },                                       
                         y: {
                             title: {
@@ -2793,6 +2844,12 @@ function myLoadFunction() {
                             max: 1000,
                             min:0,
                             ticks: {
+                                callback: function(value) {
+                                  // if (Math.floor(value) === value) {
+                                  //   return value
+                                  // }
+                                  return Math.floor(value);
+                                },
                                 stepSize: 100,
                                 font: {
                                   size: 24,
