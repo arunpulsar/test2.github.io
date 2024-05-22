@@ -102,6 +102,7 @@ function sleep(ms) {
     var isTraceOn = 0;
     var level_var, distance_var, volume_var, compensated_var, compensated_var_m, mA_output_var, temperature_var, date_var, time_var, gate_start, gate_stop, echo_var, noise_var, status_var, near_blanking_var, far_blanking_var, empty_distance, mode_var, bit0, bit1, bit2, bit3, bit4, bit5, bit6, bit7;
     var p104_units_val, p605_units_val, p104_units, p605_units, p104_rx_status, p605_rx_status, cmd_sent, param_init_query, power_init_query, p104_param_update, span_val;
+    var start_point, width_val;
     level_var = 0.000;//4.346;
     distance_var = 0.000;//1.654;
     volume_var = 0.000;//2.370;
@@ -730,6 +731,11 @@ function sleep(ms) {
         {
           xdata[i] = Math.round((xdata[i - 1] + (compensated_var/200))*1000)/1000;
         }
+        // Zooming out does not work if labels are numbers
+        for (let i = 0; i <= 200; i++)
+        {
+          xdata[i] = xdata[i].toString();
+        }
         myChart.data.labels = xdata;
         myChart.config.options.scales.x.title.text = p104_units;
         myChart.update();
@@ -901,7 +907,7 @@ function sleep(ms) {
       }
       else if(string_val.includes("/P106:")) {
         document.getElementById('p106-box').value = string_val.slice(string_val.lastIndexOf(':') + 1);//string_val.substring(string_val.indexOf(':') + 1);
-        span_val = convert_to_mtrs(document.getElementById('p106-box').value);
+        span_val = document.getElementById('p106-box').value;
         param_query = 5;
         if((param_start_val == 0) || (param_tid == false))
           settings_msg_clear();
@@ -2232,35 +2238,12 @@ function myLoadFunction() {
     sysState=cur_state;
   }
 
-  function rescale() {
-    // arbitraryLine Plugin
-    var arbitraryLine = {       // Fills near & far blanking areas, Plots Distance, gate start and stop. Shows dynamic variables
-      id: 'arbitraryLine',
-      beforeDraw(chart, args, options) {
-          const ctx = chart.canvas.getContext('2d');
-          var { ctr, chartArea: {top, right, bottom, left, width, height}, scales:
-              {x, y} } = chart;
-          ctx.save();
-          //alert("Near = " + near_blanking_var + ", Far = " + far_blanking_dist + ", Empty = " + empty_distance + ", Compensated = " + compensated_var + ", Mode = " + mode_var);
-          ctx.fillStyle = 'yellow';
-          ctx.fillRect(x.getPixelForValue(0), top, near_blanking_var*width/compensated_var, height); // Near blanking area (x.getPixelForValue(0), top, 0.3*width/7.2, height)
-          ctx.fillStyle = 'yellow';
-          ctx.fillRect(x.getPixelForValue((200.0/1.2)*empty_distance/mode_var), top, width*(far_blanking_dist - empty_distance)/compensated_var, height); // Far blanking area
-          ctx.fillStyle = '#EFFFE8';
-          ctx.fillRect(x.getPixelForValue((200.0/1.2)*(empty_distance - span_val)/mode_var), top, span_val*width/compensated_var, height); // Span
-          ctx.strokeStyle = 'red';
-          ctx.strokeRect(x.getPixelForValue(distance_var*200/compensated_var), top, 0, height);  // Distance//(x0, y0, x1, y1); (x.getPixelForValue(distance_var*200/7.2), top, 0, height)
-          ctx.strokeStyle = 'black';
-          ctx.strokeRect(x.getPixelForValue(gate_start/5), top, 0, height);  // Gate start (x.getPixelForValue((distance_var - 0.20)*200/7.2), top, 0, height)
-          ctx.strokeStyle = 'black';
-          ctx.strokeRect(x.getPixelForValue(gate_stop/5), top, 0, height);  // Gate stop (x.getPixelForValue((distance_var + 0.20)*200/7.2), top, 0, height)
-          ctx.fillStyle = 'black';
-          data_log_update();                  
-          ctx.restore();
-      }
-    }
-  }
-
+  // function check_x_axis_location (x_loc_val)  {
+  //     if(x_loc_val <= origin_x_val)
+  //         return origin_x_val;
+  //     else
+  //         return x_loc_val;
+  // }
   </script>
 
 
@@ -2631,6 +2614,11 @@ function myLoadFunction() {
                 for (let i = 1; i <= 200; i++) {
                     xdata[i] = Math.round((xdata[i - 1] + 0.036)*1000)/1000;
                 }
+                // Zooming out does not work if labels are numbers
+                for (let i = 0; i <= 200; i++)
+                {
+                  xdata[i] = xdata[i].toString();
+                }
 
                 // Echo variables
                 var echo = [];
@@ -2646,7 +2634,7 @@ function myLoadFunction() {
                     labels: xdata,            
                     datasets: [{
                         type: 'line',
-                        label: 'Datem',   // Datem array
+                        label: 'DATEM',   // Datem array
                         data: datem,
                         radius: 1,
                         pointRadius: 1,
@@ -2675,32 +2663,87 @@ function myLoadFunction() {
                         var { ctr, chartArea: {top, right, bottom, left, width, height}, scales:
                             {x, y} } = chart;
                         ctx.save();
-                        var start_point, width_val;
                         //alert("Near = " + near_blanking_var + ", Far = " + far_blanking_dist + ", Empty = " + empty_distance + ", Compensated = " + compensated_var + ", Mode = " + mode_var);
+                        
+                        /*
+                        if((near_blanking_var - xMin) >= 0)
+                        {
                         ctx.fillStyle = 'yellow';
                         //ctx.fillRect(x.getPixelForValue(0), top, near_blanking_var*width/compensated_var, height); // Near blanking area (x.getPixelForValue(0), top, 0.3*width/7.2, height)
-                        start_point = x.getPixelForValue(0);
-                        width_val = x.getPixelForValue(near_blanking_var*width/compensated_var) - x.getPixelForValue(0);
-                        ctx.fillRect(start_point, top, width_val, height);    // Near blanking area
-                        ctx.fillStyle = '#EFFFE8';
+                        if(x.getPixelForValue(0) <= x.getPixelForValue(xMin))
+                          start_point = x.getPixelForValue(0);
+                        else
+                          start_point = x.getPixelForValue(xMin);
+                        //width_val = check_x_axis_location(x.getPixelForValue(near_blanking_var*width/compensated_var));//x.getPixelForValue(near_blanking_var*width/compensated_var) - x.getPixelForValue(0);
+                        if((near_blanking_var - xMin) >= 0)
+                          width_val = near_blanking_var - xMin;
+                        else
+                          width_val = 0;
+                        console.log(start_point + ", "  + width_val + ", " + width_val*width/compensated_var + ", " + width + ", " + (x.getPixelForValue(200) - x.getPixelForValue(0)).toString());
+                        //console.log(xMin, xMax, yMin, yMax);
+                        ctx.fillRect(start_point, top, width_val*width/(xMax - xMin), height);    // Near blanking area
+                        }
+                        //ctx.fillStyle = '#EFFFE8';
                         //ctx.fillRect(x.getPixelForValue((200.0/1.2)*(empty_distance - span_val)/mode_var), top, span_val*width/compensated_var, height); // Span
-                        start_point = x.getPixelForValue((200.0/1.2)*(empty_distance - span_val)/mode_var);
-                        width_val = x.getPixelForValue((200.0/1.2)*empty_distance/mode_var) - x.getPixelForValue((200.0/1.2)*(empty_distance - span_val)/mode_var);
-                        //width_val = x.getPixelForValue((200.0/1.2)*(span_val)/mode_var);
-                        ctx.fillRect(start_point, top, width_val, height);    // Span
+                        //start_point = check_x_axis_location(x.getPixelForValue((200.0/1.2)*(empty_distance - span_val)/mode_var));
+                        //width_val = x.getPixelForValue((200.0/1.2)*empty_distance/mode_var) - x.getPixelForValue((200.0/1.2)*(empty_distance - span_val)/mode_var);
+                        // start_point = x.getPixelForValue((empty_distance - span_val)*width/compensated_var);
+                        // width_val = x.getPixelForValue(span_val*width/compensated_var);
+                        // //width_val = x.getPixelForValue((200.0/1.2)*(span_val)/mode_var);
+                        // ctx.fillRect(start_point, top, width_val, height);    // Span
                         ctx.fillStyle = 'yellow';
                         //ctx.fillRect(x.getPixelForValue((200.0/1.2)*empty_distance/mode_var), top, width*(far_blanking_dist - empty_distance)/compensated_var, height); // Far blanking area
-                        start_point = x.getPixelForValue((200.0/1.2)*empty_distance/mode_var);
-                        width_val = x.getPixelForValue((200.0/1.2)*far_blanking_dist/mode_var) - x.getPixelForValue((200.0/1.2)*empty_distance/mode_var);
-                        ctx.fillRect(start_point, top, width_val, height);    // Far blanking area
-                        console.log(empty_distance.toString() + ", " + span_val + ", " + mode_var);
+                        start_point = (x.getPixelForValue((200.0/1.2)*empty_distance/mode_var));
+                        //width_val = x.getPixelForValue((200.0/1.2)*far_blanking_dist/mode_var) - x.getPixelForValue((200.0/1.2)*empty_distance/mode_var);
+                        ctx.fillRect(start_point, top, width*(far_blanking_dist - empty_distance)/compensated_var, height);    // Far blanking area
+                        //console.log(y.getPixelForValue(0) + ", " + empty_distance.toString() + ", " + span_val + ", " + mode_var + ", " + origin_x_val);
                         ctx.strokeStyle = 'red';
                         ctx.strokeRect(x.getPixelForValue(distance_var*200/compensated_var), top, 0, height);  // Distance//(x0, y0, x1, y1); (x.getPixelForValue(distance_var*200/7.2), top, 0, height)
                         ctx.strokeStyle = 'black';
                         ctx.strokeRect(x.getPixelForValue(gate_start/5), top, 0, height);  // Gate start (x.getPixelForValue((distance_var - 0.20)*200/7.2), top, 0, height)
                         ctx.strokeStyle = 'black';
                         ctx.strokeRect(x.getPixelForValue(gate_stop/5), top, 0, height);  // Gate stop (x.getPixelForValue((distance_var + 0.20)*200/7.2), top, 0, height)
-                        ctx.fillStyle = 'black';
+                        */
+
+                        ctx.fillStyle = 'yellow';
+                        //ctx.fillRect(x.getPixelForValue(0), top, near_blanking_var*width/compensated_var, height); // Near blanking area (x.getPixelForValue(0), top, 0.3*width/7.2, height)
+                        start_point = Math.max(x.getPixelForValue(0), left);
+                        width_val = Math.max(x.getPixelForValue(near_blanking_var*width/compensated_var), left) - start_point;
+                        ctx.fillRect(start_point, top, width_val, height);    // Near blanking area
+
+                        //console.log(start_point + ", " + near_blanking_var*width/compensated_var + ", " + width_val);
+						
+                        ctx.fillStyle = '#EFFFE8';
+                        //ctx.fillRect(x.getPixelForValue((200.0/1.2)*(empty_distance - span_val)/mode_var), top, span_val*width/compensated_var, height); // Span
+                        start_point = Math.max(x.getPixelForValue((200.0/((100.0 + far_blanking_var)/100.0))*(empty_distance - span_val)/mode_var), left);
+                        width_val = Math.max(x.getPixelForValue((200.0/((100.0 + far_blanking_var)/100.0))*empty_distance/mode_var), left) - start_point;
+                        //width_val = x.getPixelForValue((200.0/1.2)*(span_val)/mode_var);
+                        ctx.fillRect(start_point, top, width_val, height);    // Span
+						
+                        ctx.fillStyle = 'yellow';
+                        //ctx.fillRect(x.getPixelForValue((200.0/1.2)*empty_distance/mode_var), top, width*(far_blanking_dist - empty_distance)/compensated_var, height); // Far blanking area
+                        start_point = Math.max(x.getPixelForValue((200.0/((100.0 + far_blanking_var)/100.0))*empty_distance/mode_var), left);
+                        width_val = Math.max(x.getPixelForValue((200.0/((100.0 + far_blanking_var)/100.0))*far_blanking_dist/mode_var), left) - start_point;
+                        ctx.fillRect(start_point, top, width_val, height);    // Far blanking area
+						
+                        //console.log(left + ", " + x.getPixelForValue(0) + ", " + near_blanking_var + ", " + far_blanking_var + ", " + far_blanking_dist + ", " + empty_distance + ", " + span_val + ", " + mode_var + ", " + compensated_var + ", " + compensated_var_m);
+                        
+                        if(Math.max(x.getPixelForValue(distance_var*200/compensated_var), left) <= x.getPixelForValue(distance_var*200/compensated_var))
+                        {
+                          ctx.strokeStyle = 'red';
+                          ctx.strokeRect(x.getPixelForValue(distance_var*200/compensated_var), top, 0, height);  // Distance//(x0, y0, x1, y1); (x.getPixelForValue(distance_var*200/7.2), top, 0, height)
+                        }
+                        if(Math.max(x.getPixelForValue(gate_start/5), left) <= x.getPixelForValue(gate_start/5))
+                        {
+                          ctx.strokeStyle = 'black';
+                          ctx.strokeRect(x.getPixelForValue(gate_start/5), top, 0, height);  // Gate start (x.getPixelForValue((distance_var - 0.20)*200/7.2), top, 0, height)
+                        }
+                        if(Math.max(x.getPixelForValue(gate_stop/5), left) <= x.getPixelForValue(gate_stop/5))
+                        {
+                          ctx.strokeStyle = 'black';
+                          ctx.strokeRect(x.getPixelForValue(gate_stop/5), top, 0, height);  // Gate stop (x.getPixelForValue((distance_var + 0.20)*200/7.2), top, 0, height)
+                        }
+                        //ctx.fillStyle = 'black';
                         data_log_update();                  
                         // ctx.fillText("Length          = " + level_var.toFixed(3) + " m", x.getPixelForValue(140), top+10); // Dynamic variables
                         // ctx.fillText("Distance       = " + distance_var.toFixed(3) + " m", x.getPixelForValue(140), top+20);
@@ -2755,15 +2798,29 @@ function myLoadFunction() {
                         ctx.restore();
                     }
                 };
-                
+
+                // Chart.plugins.register({
+                //     beforeDatasetsDraw: function(chartInstance) {
+                //         var ctx = chartInstance.chart.ctx;
+                //         var chartArea = chartInstance.chartArea;
+                //         ctx.save();
+                //         ctx.beginPath();
+
+                //         ctx.rect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
+                //         ctx.clip();
+                //     },
+                //     afterDatasetsDraw: function(chartInstance) {
+                //         chartInstance.chart.ctx.restore();
+                //     },
+                // });
+
                 var valtest = Math.round(0.5*200/compensated_var_m);//7.2);
                 var rounding;
 
                 // config block
                 var config = {
                     type: 'line',
-                    data: data,
-                    plugins: [plugin, arbitraryLine], // Uses both plugins
+                    data: data,                    
                     options: {
                       plugins: {
                         legend: {
@@ -2775,7 +2832,7 @@ function myLoadFunction() {
                             }
                         },
                         zoom: {
-                          zoom: {
+                          zoom: {                           
                             wheel: {
                               enabled: true,
                               mode: 'xy'
@@ -2798,8 +2855,8 @@ function myLoadFunction() {
                             mode: 'xy'
                           },
                           limits: {
-                            y: {minRange: 100, min: 0, max: 1000/*, minRange: 100*/},
-                            x: {minRange: 50, min: 0, max: xdata.length/*, minRange: 1000*/}
+                            y: {minRange: 200, min: 0, max: 1000/*, minRange: 100*/},
+                            x: {minRange: 20, min: 0, max: xdata.length/*, minRange: 1000*/}
                           }
                         },
                       },
@@ -2858,7 +2915,8 @@ function myLoadFunction() {
                             beginAtZero: true
                         },               
                     },                
-                    }                          
+                    },
+                    plugins: [plugin, arbitraryLine], // Uses both plugins                         
                 };
                 
                 // render / init block
