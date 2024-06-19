@@ -25,6 +25,7 @@
   <script src="index.js" defer></script>
   <script src="js/jquery-impromptu.js"></script>
   <script src="js/lang.js"></script>
+  <script src="js/param.js"></script>
 
   <style>
     .my_text
@@ -103,6 +104,9 @@ function sleep(ms) {
     var level_var, distance_var, volume_var, compensated_var, compensated_var_m, mA_output_var, temperature_var, date_var, time_var, gate_start, gate_stop, echo_var, noise_var, status_var, near_blanking_var, far_blanking_var, empty_distance, mode_var, bit0, bit1, bit2, bit3, bit4, bit5, bit6, bit7;
     var p104_units_val, p605_units_val, p104_units, p605_units, p104_rx_status, p605_rx_status, cmd_sent, param_init_query, power_init_query, p104_param_update, span_val;
     var start_point, width_val;
+    var CommandSent;
+    let a = [];
+    var s, offset;
     level_var = 0.000;//4.346;
     distance_var = 0.000;//1.654;
     volume_var = 0.000;//2.370;
@@ -137,8 +141,11 @@ function sleep(ms) {
     // set interval
     var echo_tid;
     var datem_tid;
-    var p104_tid;
-    var p605_tid;
+    //var p104_tid;
+    //var p605_tid;
+    var param_set1_tid;
+    var param_set2_tid;
+    var param_set3_tid;    
     var param_tid;
     var param_query=0;
     var isDisconnecting=0;
@@ -149,6 +156,8 @@ function sleep(ms) {
 
     var currentlang = localStorage.getItem('lang_select_List');
     var lang_map = lang_array.map(a => a.English);
+    var param_num = param_info.map(a => a.pnum);
+    var param_val = param_info.map(a => a.pvalue);
 
     // Resetting all the variables
     function reset_params() {
@@ -315,12 +324,14 @@ function sleep(ms) {
         document.getElementById("trace-message").innerHTML = lang_map[104];//"Acquiring trace data. Please wait...";
         document.getElementById("home-message").innerHTML = lang_map[104];//"Acquiring trace data. Please wait...";
 			  isIgnore_2=2; // NEED TO CHECK
-        clearTimeout(p605_tid);
+        //clearTimeout(p605_tid);
         clearTimeout(echo_tid);
         clearTimeout(datem_tid);
         clearTimeout(param_tid);
-        p104_tid = setInterval(p104_start, 1000);//5000);
-        button_press = 14;
+        //p104_tid = setInterval(p104_start, 1000);//5000);
+        //param_set1_tid = setInterval(param_set1_start, 5000);
+        param_set1_start();
+        //button_press = 14;
       }
     }
 
@@ -340,11 +351,11 @@ function sleep(ms) {
         tids_trace_reset();
         // settings_clear();
         settings_msg_clear();
-        if(param_init_query == 0) {
+        /*if(param_init_query == 0) {
           param_start_val = 1;
           param_query = 0;
           param_tid = setInterval(param_start, 1000);
-        }
+        }*/
       }
     }
 
@@ -415,8 +426,11 @@ function sleep(ms) {
     // no need to recall the function (it's an interval, it'll loop forever)
     if(login_stage == 4) { // TRACE ON state
         clearTimeout(echo_tid);
-        clearTimeout(p104_tid);
-        clearTimeout(p605_tid);
+        //clearTimeout(p104_tid);
+        //clearTimeout(p605_tid);
+        clearTimeout(param_set1_tid);
+        clearTimeout(param_set2_tid);
+        clearTimeout(param_set3_tid);
         clearTimeout(param_tid);  
         sendAT('GET ECHO');
         document.getElementById("trace-message").innerHTML = lang_map[113];//"Acquiring ECHO data. Please wait...";
@@ -435,8 +449,11 @@ function sleep(ms) {
     function datem_start() {
         if(login_stage == 4) { // TRACE ON state
             clearTimeout(datem_tid);
-            clearTimeout(p104_tid);
-            clearTimeout(p605_tid);
+            //clearTimeout(p104_tid);
+            //clearTimeout(p605_tid);
+            clearTimeout(param_set1_tid);
+            clearTimeout(param_set2_tid);
+            clearTimeout(param_set3_tid);
             clearTimeout(param_tid);
             sendAT('GET DATEM');
             document.getElementById("trace-message").innerHTML = lang_map[114];//"Acquiring DATEM data. Please wait...";
@@ -492,6 +509,75 @@ function sleep(ms) {
         }      
     }
 
+    function param_set1_start() {
+      if(login_stage == 4) {
+            //clearTimeout(p605_tid);
+            clearTimeout(param_set1_tid);
+            clearTimeout(param_set2_tid);
+            clearTimeout(param_set3_tid);
+            clearTimeout(echo_tid);
+            clearTimeout(datem_tid);
+            clearTimeout(param_tid);
+            sendAT('SENDPART1');
+            document.getElementById("trace-message").innerHTML = lang_map[146];//"Querying P104. Please wait...";
+            document.getElementById("home-message").innerHTML = lang_map[146];//"Querying P104. Please wait...";
+            button_press = 16;
+            // p104_tid = setInterval(p104_start, 5000);
+            param_set1_tid = setInterval(param_set1_start, 5000);
+
+        } else {
+            // clearTimeout(p104_tid);
+            // clearTimeout(p605_tid);
+            // clearTimeout(echo_tid);
+            // clearTimeout(datem_tid);
+            tids_trace_reset();
+        }          
+    }
+
+    function param_set2_start() {
+      if(login_stage == 4) {
+            //clearTimeout(p605_tid);
+            clearTimeout(param_set1_tid);
+            clearTimeout(param_set3_tid);
+            clearTimeout(echo_tid);
+            clearTimeout(datem_tid);
+            clearTimeout(param_tid);
+            sendAT('SENDPART2');
+            document.getElementById("trace-message").innerHTML = lang_map[147];//"Querying P104. Please wait...";
+            document.getElementById("home-message").innerHTML = lang_map[147];//"Querying P104. Please wait...";
+            button_press = 17;
+            // p104_tid = setInterval(p104_start, 5000);
+        } else {
+            // clearTimeout(p104_tid);
+            // clearTimeout(p605_tid);
+            // clearTimeout(echo_tid);
+            // clearTimeout(datem_tid);
+            tids_trace_reset();
+        }          
+    }
+
+    function param_set3_start() {
+      if(login_stage == 4) {
+            //clearTimeout(p605_tid);
+            clearTimeout(param_set1_tid);
+            clearTimeout(param_set2_tid);
+            clearTimeout(echo_tid);
+            clearTimeout(datem_tid);
+            clearTimeout(param_tid);
+            sendAT('SENDPART3');
+            document.getElementById("trace-message").innerHTML = lang_map[148];//"Querying P104. Please wait...";
+            document.getElementById("home-message").innerHTML = lang_map[148];//"Querying P104. Please wait...";
+            button_press = 18;
+            // p104_tid = setInterval(p104_start, 5000);
+        } else {
+            // clearTimeout(p104_tid);
+            // clearTimeout(p605_tid);
+            // clearTimeout(echo_tid);
+            // clearTimeout(datem_tid);
+            tids_trace_reset();
+        }          
+    }
+
     function trace_button_check() {
       //log("trace_button_check :"+login_stage);
         if(login_stage == 3 /*|| login_stage == 1*/ || login_stage == 2) {
@@ -510,12 +596,16 @@ function sleep(ms) {
               document.getElementById("trace-message").innerHTML = lang_map[104];//"Acquiring trace data. Please wait...";
               document.getElementById("home-message").innerHTML = lang_map[104];//"Acquiring trace data. Please wait...";
 			        isIgnore_2=2; // NEED TO CHECK
-              clearTimeout(p605_tid);
+              //clearTimeout(p605_tid);
+              //clearTimeout(param_set1_tid);
+              clearTimeout(param_set2_tid);
+              clearTimeout(param_set3_tid);
               clearTimeout(echo_tid);
               clearTimeout(datem_tid);
               clearTimeout(param_tid);
-              p104_tid = setInterval(p104_start, 1000);//5000);
-              button_press = 14;
+              //p104_tid = setInterval(p104_start, 1000);//5000);
+              param_set1_tid = setInterval(param_set1_start, 500);
+              //button_press = 14;
           }
         } else {
           log(lang_map[64]);//log('Device not in Normal mode!');//log('Device not in passthrough mode!');          
@@ -536,8 +626,11 @@ function sleep(ms) {
         }
         else if (login_stage == 2) { // currently in AT mode
           login_stage = 3;
-          clearTimeout(p104_tid);
-          clearTimeout(p605_tid);
+          //clearTimeout(p104_tid);
+          //clearTimeout(p605_tid);
+          clearTimeout(param_set1_tid);
+          clearTimeout(param_set2_tid);
+          clearTimeout(param_set3_tid);
           clearTimeout(echo_tid);
           clearTimeout(datem_tid);
           clearTimeout(param_tid);
@@ -555,13 +648,19 @@ function sleep(ms) {
     function tids_trace_reset() {
       login_stage = 3; // back to the PT mode
       document.getElementById('btn_trace').innerHTML = lang_map[9];//'TRACE ON';
-      clearTimeout(p104_tid);
-      clearTimeout(p605_tid);
+      //clearTimeout(p104_tid);
+      //clearTimeout(p605_tid);
+      clearTimeout(param_set1_tid);
+      clearTimeout(param_set2_tid);
+      clearTimeout(param_set3_tid);
       clearTimeout(echo_tid);
       clearTimeout(datem_tid);
       clearTimeout(param_tid);
-      p104_tid = false;
-      p605_tid = false;
+      //p104_tid = false;
+      //p605_tid = false;
+      param_set1_tid = false;
+      param_set2_tid = false;
+      param_set3_tid = false;
       echo_tid = false;
       datem_tid = false;
       param_tid = false;
@@ -589,8 +688,11 @@ function sleep(ms) {
           // start the static timers
           document.getElementById('btn_trace').innerHTML = lang_map[8];//'TRACE OFF';
           login_stage = 3;
-          clearTimeout(p104_tid);
-          clearTimeout(p605_tid);
+          //clearTimeout(p104_tid);
+          //clearTimeout(p605_tid);
+          clearTimeout(param_set1_tid);
+          clearTimeout(param_set2_tid);
+          clearTimeout(param_set3_tid);
           clearTimeout(echo_tid);
           clearTimeout(datem_tid);
           clearTimeout(param_tid);
@@ -635,6 +737,61 @@ function sleep(ms) {
       }
     }
 
+    function getVal(i) {
+      //param_val[i] = parseInt(hexToFloat('0x' + ('00' + s.getUint8(4*i).toString(16)).slice(-2) + ('00' + s.getUint8(4*i + 1).toString(16)).slice(-2) + ('00' + s.getUint8(4*i + 2).toString(16)).slice(-2) + ('00' + s.getUint8(4*i + 3).toString(16)).slice(-2)));
+      //return (param_val[i]);
+      return(hexToFloat('0x' + ('00' + s.getUint8(4*i).toString(16)).slice(-2) + ('00' + s.getUint8(4*i + 1).toString(16)).slice(-2) + ('00' + s.getUint8(4*i + 2).toString(16)).slice(-2) + ('00' + s.getUint8(4*i + 3).toString(16)).slice(-2)));
+    }
+
+    function param_verify(i) {
+      switch (param_num[offset*60 + i]) {
+        case 241:
+          document.getElementById('p241List').value = parseInt(getVal(i)) + 1;
+          //console.log(document.getElementById('p241List').value);
+          if((document.getElementById('p241List').value >=2) && (document.getElementById('p241List').value <=4))
+            alert(lang_map[85]);
+          break;
+        case 100:
+          document.getElementById('p100List').value = parseInt(getVal(i));
+          break;
+        case 101:
+          break;
+        case 104:
+          document.getElementById('p104List').value = parseInt(getVal(i));
+          p104_units_val = parseInt(document.getElementById('p104List').value);
+          p104_measurement_units();  // Update the measurement units to be displayed
+          break;
+        case 105:
+          document.getElementById('p105-box').value = getVal(i).toFixed(3);
+          break;
+        case 106:
+          document.getElementById('p106-box').value = getVal(i).toFixed(3);
+          span_val = document.getElementById('p106-box').value;
+          break;
+        case 107:
+          near_blanking_var = getVal(i).toFixed(3);
+          break;
+        case 108:
+          far_blanking_var = getVal(i).toFixed(3);
+          break;          
+        case 808:
+          document.getElementById('p808List').value = parseInt(getVal(i));
+          break;
+        case 605:
+          document.getElementById('p605List').value = parseInt(getVal(i)) + 1;
+          p605_units_val = parseInt(document.getElementById('p605List').value) - 1;
+          p605_volume_units();  // Update the volume units to be displayed
+          break;
+        case 21:
+          document.getElementById('p21-box').value = getVal(i).toFixed(3);
+          break;
+        case 586:
+          temperature_var = getVal(i);
+          break;
+        default:
+          break;        
+      }
+    }
 
     const utf8encoder = new TextEncoder();
     const windows1251 = new TextEncoder();
@@ -668,19 +825,20 @@ function sleep(ms) {
     }
 
     // Function to convert unsigned int 8 bit format to hex and relevant functions within it
-    function Uint8tohex(s)
+    function Uint8tohex(incoming_data)
     {
-      let a = [];     
+      a = [];
+      s = incoming_data;     
       var check;
       var floatval;
-      const doc_value = document.getElementById('cmd').value;
+      const doc_value = CommandSent;//document.getElementById('cmd').value;
       for (let i = 0; i < s.byteLength; i++) {
         check = s.getUint8(i);
-        if((i >= 46) && (i < 246) && (((doc_value == "GET ECHO") && (button_press == 8)) || (button_press == 10))) // Changed from (i >= 42) && (i < 242)
+        if((i >= 46) && (i < 246) && (doc_value == "GET ECHO"))//(((doc_value == "GET ECHO") && (button_press == 8)) || (button_press == 10))) // Changed from (i >= 42) && (i < 242)
         {
           echo[i-46] = check*1000/255;  // Changed from echo[i-42]
         }
-        else if((i >= 46) && (i < 246) && (((doc_value == "GET DATEM") && (button_press == 8)) || (button_press == 11)))  // Changed from (i >= 42) && (i < 242)
+        else if((i >= 46) && (i < 246) && (doc_value == "GET DATEM"))//(((doc_value == "GET DATEM") && (button_press == 8)) || (button_press == 11)))  // Changed from (i >= 42) && (i < 242)
         {
           datem[i-46] = check*1000/255; // Changed from datem[i-42]
         }
@@ -689,7 +847,7 @@ function sleep(ms) {
       }
  
       
-      if((((doc_value == "GET ECHO") || (doc_value == "GET DATEM") && (button_press == 8)) || (button_press == 10) || (button_press == 11)) && (s.byteLength == 246)) {
+      if((((doc_value == "GET ECHO") || (doc_value == "GET DATEM") /*&& (button_press == 8)*/) /*|| (button_press == 10) || (button_press == 11)*/) && (s.byteLength == 246)) {
         // Populate the dynamic variables
         level_var = hexToFloat('0x' + ('00' + s.getUint8(0).toString(16)).slice(-2) + ('00' + s.getUint8(1).toString(16)).slice(-2) + ('00' + s.getUint8(2).toString(16)).slice(-2) + ('00' + s.getUint8(3).toString(16)).slice(-2));
         distance_var = hexToFloat('0x' + ('00' + s.getUint8(4).toString(16)).slice(-2) + ('00' + s.getUint8(5).toString(16)).slice(-2) + ('00' + s.getUint8(6).toString(16)).slice(-2) + ('00' + s.getUint8(7).toString(16)).slice(-2));
@@ -739,18 +897,35 @@ function sleep(ms) {
         myChart.data.labels = xdata;
         myChart.config.options.scales.x.title.text = p104_units;
         myChart.update();
-        // _this.myChart.options.scales.x.time.unit = options.unit;
-        // _this.myChart.options.scales.x.min = options.limits.x.min;
-        // _this.myChart.options.scales.x.max = options.limits.x.max;     
-        // _this.myChart.options.scales.x.time.displayFormats = options.formats;
-        // _this.myChart.options.plugins.zoom.limits.x.max = options.limits.x.min;
-        // _this.myChart.options.plugins.zoom.limits.x.max = options.limits.x.max;
-        // _this.myChart.options.scales.y.time.unit = options.unit;
-        // _this.myChart.options.scales.y.min = options.limits.y.min;
-        // _this.myChart.options.scales.y.max = options.limits.y.max;     
-        // _this.myChart.options.scales.y.time.displayFormats = options.formats;
-        // _this.myChart.options.plugins.zoom.limits.y.max = options.limits.y.min;
-        // _this.myChart.options.plugins.zoom.limits.y.max = options.limits.y.max
+      }
+      else if (doc_value == "SENDPART1")//(((doc_value == "SENDPART1") && (button_press == 8)) || (button_press == 16))
+      {
+        offset = 0;
+        for (let i = 0; i < 60; i++) {
+            param_verify(i);          
+        }
+        //console.log("Got Part1");
+        param_set2_start();
+        param_set2_tid = setInterval(param_set2_start, 5000);
+      }
+      else if (doc_value == "SENDPART2")//(((doc_value == "SENDPART2") && (button_press == 8)) || (button_press == 17))
+      {
+        offset = 1;
+        for (let i = 0; i < 60; i++) {
+            param_verify(i);          
+        }
+        //console.log("Got Part2");
+        param_set3_start();
+        param_set3_tid = setInterval(param_set3_start, 5000);
+      }
+      else if (doc_value == "SENDPART3")//(((doc_value == "SENDPART3") && (button_press == 8)) || (button_press == 18))
+      {
+        offset = 2;
+        for (let i = 0; i < (param_info.length - offset*60); i++) {
+            param_verify(i);          
+        }
+        //console.log("Got Part3");
+        echo_start();
       }
       return a;
     }
@@ -883,9 +1058,13 @@ function sleep(ms) {
         p104_measurement_units();  // Update the measurement units to be displayed
         if((param_start_val == 0) || (param_tid == false))
           settings_msg_clear();
+        /*
         if(isTraceOn == 1) {
           //sendAT('/P605');
-          clearTimeout(p104_tid);
+          //clearTimeout(p104_tid);
+          clearTimeout(param_set1_tid);
+          clearTimeout(param_set2_tid);
+          clearTimeout(param_set3_tid);
           clearTimeout(echo_tid);
           clearTimeout(datem_tid);
           clearTimeout(param_tid);
@@ -893,7 +1072,7 @@ function sleep(ms) {
           document.getElementById("home-message").innerHTML = lang_map[111];//"Querying P605. Please wait...";
           p605_tid = setInterval(p605_start, 1000);//5000);
           button_press = 14;
-        } else if (p104_param_update == 1)
+        } else */if (p104_param_update == 1)
           p104_update();
         param_query = 3;
         document.getElementById("btnp104").style.background = '#33B34A';   //PULSAR GREEN
@@ -933,20 +1112,25 @@ function sleep(ms) {
         p605_volume_units();  // Update the volume units to be displayed
         if((param_start_val == 0) || (param_tid == false))
           settings_msg_clear();
+        /*
         if(isTraceOn == 1) {
 
           // sendAT('GET ECHO');
           // button_press = 10;
           // datem_tid = setInterval(datem_start, 5000);
-          clearTimeout(p605_tid);
+          //clearTimeout(p605_tid);
           clearTimeout(datem_tid);
-          clearTimeout(p104_tid);
+          //clearTimeout(p104_tid);
           clearTimeout(param_tid);
+          clearTimeout(param_set1_tid);
+          clearTimeout(param_set2_tid);
+          clearTimeout(param_set3_tid);
           document.getElementById("trace-message").innerHTML = lang_map[113];//"Acquiring ECHO data. Please wait...";
           document.getElementById("home-message").innerHTML = lang_map[113];//"Acquiring ECHO data. Please wait...";
           echo_tid = setInterval(echo_start, 1000);//5000);
 
         }
+        */
         param_query = 7;
         document.getElementById("btnp605").style.background = '#33B34A';   //PULSAR GREEN
       }
@@ -966,7 +1150,7 @@ async function incomingData(event){
       let readInValue = await outboundChar.readValue();
       let decoder = new TextDecoder('utf-8');
       // var checkBox = document.getElementById("myCheck");
-      const doc_value = document.getElementById('cmd').value;
+      const doc_value = CommandSent;//document.getElementById('cmd').value;
       const string_check =  decoder.decode(readInValue).replace('\r','\r ← ').replace('\n','').replace('\0','');
       //alert("button_press="+button_press+" readInValue="+readInValue+"login_stage="+login_stage+" string_check="+string_check);
       //alert(login_stage + " " +isIgnore);
@@ -994,7 +1178,7 @@ async function incomingData(event){
      
 
       //alert(string_check + "2");
-      if ((button_press == 10) || (button_press == 11) || ((button_press == 8) && ((doc_value == "GET ECHO") || (doc_value == "GET DATEM"))))
+      if (/*(button_press == 10) || (button_press == 11) || (button_press == 16) || (button_press == 17) || (button_press == 18) ||*/ (/*(button_press == 8) &&*/ ((doc_value == "GET ECHO") || (doc_value == "GET DATEM") || (doc_value == "SENDPART1") || (doc_value == "SENDPART2") || (doc_value == "SENDPART3"))))
       {
         var hex = Uint8tohex(readInValue);
         // if((button_press == 10) || ((button_press == 8) && (doc_value == "GET ECHO")))
@@ -1218,7 +1402,7 @@ async function incomingData(event){
       if(isIgnore_2 == 1 || isDisconnecting == 2){
         return;
       }
-
+      CommandSent = cmd;
       if(cmd === 'AT+PT=1'){
           log(lang_map[75]);//log(' → Logging ...'   );
           await sleep(2 * 1000); // needed 
@@ -1287,6 +1471,7 @@ async function incomingData(event){
 
 // Send an AT command to the CodeLess BLE peer
 async function sendAT(cmd) {
+      CommandSent = cmd;
       if (cmd === 'AT+PWRLVL')
         cmd_sent = "AT+PWRLVL";
       else if (cmd.includes("AT+PWRLVL="))
@@ -1305,7 +1490,7 @@ async function sendAT(cmd) {
         let cmd1 = pwd.replace(/[0-9]/g, "*");
         log(' → /ACCESS:' + cmd1);
       }
-      else if ((cmd != "GET ECHO") && (cmd != "GET DATEM") && !((isTraceOn == 1) && ((cmd == "/P104") || (cmd == "/P605")))) {
+      else if ((cmd != "GET ECHO") && (cmd != "GET DATEM") && (cmd != "SENDPART1") && (cmd != "SENDPART2") && (cmd != "SENDPART3") && !((isTraceOn == 1) && ((cmd == "/P104") || (cmd == "/P605")))) {
         if((cmd_sent == "AT+PWRLVL") && (power_init_query == 0))
           log(lang_map[82]);//log(' → Checking bluetooth power level');
         else
@@ -1502,6 +1687,7 @@ async function sendAT(cmd) {
       if((login_stage >= 2) && (isDisconnecting == 0)) {
         tids_trace_reset();
         isIgnore=0;
+        var alphanumericPattern=/^[A-za-z0-9]+$/; // alphanumericPattern to poll the Input String
         switch(button_press) {
           case 28:
             if(document.getElementById("deviceName-box").value == "") {            
@@ -1513,6 +1699,10 @@ async function sendAT(cmd) {
                 alert(lang_map[88]);//alert('Device Name can only have a maximum of 4 alphanumeric characters!');
                 settings_msg_clear();
               }
+            else if(!alphanumericPattern.test(document.getElementById("deviceName-box").value)){
+              alert(lang_map[145]); // alert(Please enter A-Z,a-z,0-9! Device Name can not contain special characters!)
+              settings_msg_clear();
+            }
               else {
                 document.getElementById("settings-message").innerHTML = lang_map[144];//"Setting new Bluetooth device name. Please wait...";
                 document.getElementById("btndeviceName").style.background = '#FFCE34';   //PULSAR YELLOW
@@ -2238,12 +2428,8 @@ function myLoadFunction() {
     sysState=cur_state;
   }
 
-  // function check_x_axis_location (x_loc_val)  {
-  //     if(x_loc_val <= origin_x_val)
-  //         return origin_x_val;
-  //     else
-  //         return x_loc_val;
-  // }
+  
+
   </script>
 
 
@@ -2664,47 +2850,6 @@ function myLoadFunction() {
                             {x, y} } = chart;
                         ctx.save();
                         //alert("Near = " + near_blanking_var + ", Far = " + far_blanking_dist + ", Empty = " + empty_distance + ", Compensated = " + compensated_var + ", Mode = " + mode_var);
-                        
-                        /*
-                        if((near_blanking_var - xMin) >= 0)
-                        {
-                        ctx.fillStyle = 'yellow';
-                        //ctx.fillRect(x.getPixelForValue(0), top, near_blanking_var*width/compensated_var, height); // Near blanking area (x.getPixelForValue(0), top, 0.3*width/7.2, height)
-                        if(x.getPixelForValue(0) <= x.getPixelForValue(xMin))
-                          start_point = x.getPixelForValue(0);
-                        else
-                          start_point = x.getPixelForValue(xMin);
-                        //width_val = check_x_axis_location(x.getPixelForValue(near_blanking_var*width/compensated_var));//x.getPixelForValue(near_blanking_var*width/compensated_var) - x.getPixelForValue(0);
-                        if((near_blanking_var - xMin) >= 0)
-                          width_val = near_blanking_var - xMin;
-                        else
-                          width_val = 0;
-                        console.log(start_point + ", "  + width_val + ", " + width_val*width/compensated_var + ", " + width + ", " + (x.getPixelForValue(200) - x.getPixelForValue(0)).toString());
-                        //console.log(xMin, xMax, yMin, yMax);
-                        ctx.fillRect(start_point, top, width_val*width/(xMax - xMin), height);    // Near blanking area
-                        }
-                        //ctx.fillStyle = '#EFFFE8';
-                        //ctx.fillRect(x.getPixelForValue((200.0/1.2)*(empty_distance - span_val)/mode_var), top, span_val*width/compensated_var, height); // Span
-                        //start_point = check_x_axis_location(x.getPixelForValue((200.0/1.2)*(empty_distance - span_val)/mode_var));
-                        //width_val = x.getPixelForValue((200.0/1.2)*empty_distance/mode_var) - x.getPixelForValue((200.0/1.2)*(empty_distance - span_val)/mode_var);
-                        // start_point = x.getPixelForValue((empty_distance - span_val)*width/compensated_var);
-                        // width_val = x.getPixelForValue(span_val*width/compensated_var);
-                        // //width_val = x.getPixelForValue((200.0/1.2)*(span_val)/mode_var);
-                        // ctx.fillRect(start_point, top, width_val, height);    // Span
-                        ctx.fillStyle = 'yellow';
-                        //ctx.fillRect(x.getPixelForValue((200.0/1.2)*empty_distance/mode_var), top, width*(far_blanking_dist - empty_distance)/compensated_var, height); // Far blanking area
-                        start_point = (x.getPixelForValue((200.0/1.2)*empty_distance/mode_var));
-                        //width_val = x.getPixelForValue((200.0/1.2)*far_blanking_dist/mode_var) - x.getPixelForValue((200.0/1.2)*empty_distance/mode_var);
-                        ctx.fillRect(start_point, top, width*(far_blanking_dist - empty_distance)/compensated_var, height);    // Far blanking area
-                        //console.log(y.getPixelForValue(0) + ", " + empty_distance.toString() + ", " + span_val + ", " + mode_var + ", " + origin_x_val);
-                        ctx.strokeStyle = 'red';
-                        ctx.strokeRect(x.getPixelForValue(distance_var*200/compensated_var), top, 0, height);  // Distance//(x0, y0, x1, y1); (x.getPixelForValue(distance_var*200/7.2), top, 0, height)
-                        ctx.strokeStyle = 'black';
-                        ctx.strokeRect(x.getPixelForValue(gate_start/5), top, 0, height);  // Gate start (x.getPixelForValue((distance_var - 0.20)*200/7.2), top, 0, height)
-                        ctx.strokeStyle = 'black';
-                        ctx.strokeRect(x.getPixelForValue(gate_stop/5), top, 0, height);  // Gate stop (x.getPixelForValue((distance_var + 0.20)*200/7.2), top, 0, height)
-                        */
-
                         ctx.fillStyle = 'yellow';
                         //ctx.fillRect(x.getPixelForValue(0), top, near_blanking_var*width/compensated_var, height); // Near blanking area (x.getPixelForValue(0), top, 0.3*width/7.2, height)
                         start_point = Math.max(x.getPixelForValue(0), left);
@@ -2798,22 +2943,7 @@ function myLoadFunction() {
                         ctx.restore();
                     }
                 };
-
-                // Chart.plugins.register({
-                //     beforeDatasetsDraw: function(chartInstance) {
-                //         var ctx = chartInstance.chart.ctx;
-                //         var chartArea = chartInstance.chartArea;
-                //         ctx.save();
-                //         ctx.beginPath();
-
-                //         ctx.rect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
-                //         ctx.clip();
-                //     },
-                //     afterDatasetsDraw: function(chartInstance) {
-                //         chartInstance.chart.ctx.restore();
-                //     },
-                // });
-
+                
                 var valtest = Math.round(0.5*200/compensated_var_m);//7.2);
                 var rounding;
 
@@ -3239,10 +3369,10 @@ function myLoadFunction() {
       <table>
         <tr>
           <td style=" text-align:center;font-size:24px;  background-color:rgb(51, 179, 74);;color:#2e2323;">
-            <p style="font-family:'Segoe UI Normal';  width: 115%; text-align:center; color:#ffffff; font-size:20pt;line-height:40px;">&copy; Pulsar Measurement 2023<br></p>
+            <p style="font-family:'Segoe UI Normal';  width: 115%; text-align:center; color:#ffffff; font-size:20pt;line-height:40px;">&copy; Pulsar Measurement 2024<br></p>
           </td>
           <td style=" text-align:center;font-size:24px;  background-color:rgb(51, 179, 74);;color:#2e2323;">
-            <p style="font-family:'Segoe UI Normal';  width: 0%; text-align:right; color:#ffffff; font-size:12pt;line-height:40px; font-style: italic;">v2.0.0<br></p>
+            <p style="font-family:'Segoe UI Normal';  width: 0%; text-align:right; color:#ffffff; font-size:12pt;line-height:40px; font-style: italic;">v2.3.0<br></p>
           </td>
         </tr>
       </table>

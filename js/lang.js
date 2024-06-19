@@ -587,4 +587,20 @@ var lang_array = [
         English: "Setting new Bluetooth device name. Please wait...",
         German: "Neuen Bluetooth-Gerätenamen festlegen. Bitte Warten...",
     },
+    {   //Index 145
+        English: "Please enter A-Z,a-z,0-9! Device Name cannot contain special characters!",
+        German: "Bitte geben Sie A-Z,a-z,0-9 ein! Der Gerätename darf keine Sonderzeichen enthalten!",
+    },
+    {   //Index 146
+        English: "Querying parameter set 1. Please wait...",
+        German: "Parametersatz 1 wird abgefragt. Bitte Warten...",
+    },
+    {   //Index 147
+        English: "Querying parameter set 2. Please wait...",
+        German: "Parametersatz 2 wird abgefragt. Bitte Warten...",
+    },
+    {   //Index 148
+        English: "Querying parameter set 3. Please wait...",
+        German: "Parametersatz 3 wird abgefragt. Bitte Warten...",
+    },
 ];
